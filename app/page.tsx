@@ -248,12 +248,12 @@ export default function Home() {
           {/* Row 1 — 2 columns */}
           <div className="grid grid-cols-2 gap-2.5">
             <BottomButton
-              href="#"
+              href="/workflow"
               icon={<MousePointerClick size={22} strokeWidth={1.75} />}
               label="Automations"
             />
             <BottomButton
-              href="#"
+              href="/integrations"
               icon={<Puzzle size={22} strokeWidth={1.75} />}
               label="Integrations"
             />
@@ -262,17 +262,17 @@ export default function Home() {
           {/* Row 2 — 3 columns */}
           <div className="grid grid-cols-3 gap-2.5">
             <BottomButton
-              href="#"
+              href="/gallery"
               icon={<GalleryHorizontal size={22} strokeWidth={1.75} />}
               label="Gallery"
             />
             <BottomButton
-              href="#"
+              href="/mail"
               icon={<Mail size={22} strokeWidth={1.75} />}
               label="Mail"
             />
             <BottomButton
-              href="#"
+              href="/chat"
               icon={<MessageCircle size={22} strokeWidth={1.75} />}
               label="Text BF.D"
               primary
