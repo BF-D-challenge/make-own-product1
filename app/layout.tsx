@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     title: "BF.D",
   },
   icons: {
-    apple: "/icons/icon-192.svg",
+    apple: "/icons/icon-192.png",
   },
 };
 
