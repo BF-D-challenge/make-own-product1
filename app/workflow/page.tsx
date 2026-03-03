@@ -14,9 +14,7 @@ import {
   type Workflow,
 } from "@/lib/supabase";
 import Link from "next/link";
-
-// Placeholder user id until auth is wired up
-const PLACEHOLDER_USER_ID = "demo-user";
+import { useAuth } from "@/components/AuthProvider";
 
 // ── Empty state ──────────────────────────────────────────────────────────────
 function EmptyState({ onAdd }: { onAdd: () => void }) {
@@ -66,6 +64,8 @@ function ConfigBanner() {
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 export default function WorkflowPage() {
+  const { user } = useAuth();
+  const userId = user?.id ?? "demo-user";
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -80,7 +80,7 @@ export default function WorkflowPage() {
       return;
     }
     try {
-      const data = await getWorkflows(PLACEHOLDER_USER_ID);
+      const data = await getWorkflows(userId);
       setWorkflows(data);
     } catch {
       // silently fall back to empty
@@ -109,14 +109,14 @@ export default function WorkflowPage() {
         if (supabaseReady) {
           const created = await createWorkflow({
             ...data,
-            user_id: PLACEHOLDER_USER_ID,
+            user_id: userId,
           });
           setWorkflows((prev) => [created, ...prev]);
         } else {
           const mock: Workflow = {
             ...data,
             id: crypto.randomUUID(),
-            user_id: PLACEHOLDER_USER_ID,
+            user_id: userId,
             created_at: new Date().toISOString(),
             last_sent_at: null,
           };

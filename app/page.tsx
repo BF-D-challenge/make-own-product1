@@ -8,6 +8,7 @@ import {
   Mail,
   MessageCircle,
 } from "lucide-react";
+import { useAuth } from "@/components/AuthProvider";
 
 // SVG noise texture as data URL
 const NOISE_SVG = `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`;
@@ -47,7 +48,6 @@ function AvatarPlaceholder() {
           "linear-gradient(135deg, #7dd3fc 0%, #38bdf8 40%, #6366f1 100%)",
       }}
     >
-      {/* Simple silhouette */}
       <div
         className="w-5 h-5 rounded-full mb-0 translate-y-1"
         style={{ background: "rgba(255,255,255,0.45)" }}
@@ -71,15 +71,15 @@ function BottomButton({ href, icon, label, primary }: BottomButtonProps) {
       style={{
         background: primary
           ? "linear-gradient(145deg, rgba(14,165,233,0.88) 0%, rgba(56,189,248,0.78) 100%)"
-          : "rgba(224, 242, 254, 0.45)",
+          : "rgba(255,255,255,0.25)",
         borderColor: primary
           ? "rgba(186,230,253,0.55)"
-          : "rgba(255,255,255,0.68)",
+          : "rgba(255,255,255,0.4)",
         backdropFilter: "blur(14px)",
         WebkitBackdropFilter: "blur(14px)",
         boxShadow: primary
           ? "0 4px 18px rgba(14,165,233,0.28), inset 0 1px 0 rgba(255,255,255,0.35)"
-          : "0 2px 10px rgba(148,163,184,0.1), inset 0 1px 0 rgba(255,255,255,0.55)",
+          : "inset 0 1px 0 rgba(255,255,255,0.5)",
       }}
     >
       <span className={primary ? "text-white" : "text-slate-500"}>{icon}</span>
@@ -95,6 +95,7 @@ function BottomButton({ href, icon, label, primary }: BottomButtonProps) {
 }
 
 export default function Home() {
+  const { signOut } = useAuth();
   const [dateStr, setDateStr] = useState("\u00a0");
   const [greeting, setGreeting] = useState("Good afternoon");
 
@@ -137,7 +138,6 @@ export default function Home() {
         style={{
           minHeight: "100svh",
           backgroundColor: "#e0f2fe",
-          // Desktop drop shadow applied directly
           boxShadow:
             "0 0 0 1px rgba(148,163,184,0.08), 0 32px 80px rgba(14,165,233,0.12), 0 8px 32px rgba(0,0,0,0.06)",
         }}
@@ -148,15 +148,17 @@ export default function Home() {
           <span className="text-sm font-medium text-slate-500 tabular-nums">
             {dateStr}
           </span>
-          <AvatarPlaceholder />
+          <button onClick={signOut} title="로그아웃">
+            <AvatarPlaceholder />
+          </button>
         </div>
 
-        {/* ── 2. MIDDLE HERO SECTION ── */}
+        {/* ── 2. HERO CARD ── */}
         <div
-          className="relative z-10 mx-4 mt-2 mb-3 rounded-3xl overflow-hidden"
-          style={{ minHeight: "300px", flex: "1 1 auto" }}
+          className="relative z-10 mx-4 mt-1 rounded-3xl overflow-hidden"
+          style={{ height: "55svh" }}
         >
-          {/* Sky gradient (photo placeholder) */}
+          {/* Sky gradient background */}
           <div
             aria-hidden
             className="absolute inset-0"
@@ -197,56 +199,34 @@ export default function Home() {
                 "radial-gradient(circle, rgba(255,255,255,0.65) 0%, transparent 70%)",
             }}
           />
+
+          {/* Strong bottom gradient for text legibility */}
           <div
             aria-hidden
-            className="absolute bottom-12 left-8 w-20 h-20 rounded-full pointer-events-none"
+            className="absolute bottom-0 left-0 right-0 pointer-events-none"
             style={{
+              height: "60%",
               background:
-                "radial-gradient(circle, rgba(147,197,253,0.4) 0%, transparent 70%)",
-              filter: "blur(8px)",
+                "linear-gradient(to bottom, transparent 0%, rgba(14,100,140,0.18) 40%, rgba(5,60,100,0.42) 100%)",
             }}
           />
 
-          {/* Radial vignette — edges fade to #e0f2fe */}
-          <div
-            aria-hidden
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background:
-                "radial-gradient(ellipse 100% 90% at 50% 40%, transparent 30%, rgba(224,242,254,0.55) 65%, #e0f2fe 95%)",
-            }}
-          />
-
-          {/* Bottom gradient fade */}
-          <div
-            aria-hidden
-            className="absolute bottom-0 left-0 right-0 h-28 pointer-events-none"
-            style={{
-              background:
-                "linear-gradient(to bottom, transparent 0%, rgba(224,242,254,0.9) 100%)",
-            }}
-          />
-
-          {/* Greeting content */}
-          <div
-            className="relative z-10 flex flex-col justify-end h-full p-6 pb-7"
-            style={{ minHeight: "300px" }}
-          >
-            <p className="text-slate-400 text-sm font-medium mb-1.5 tracking-wide">
-              &#8212;&#xb0;C
-            </p>
-            <h1 className="text-[2rem] font-bold text-slate-800 leading-[1.18] tracking-tight">
-              {greeting},
-              <br />
-              <span className="text-slate-700">이름</span>
+          {/* Greeting overlaid at bottom-left */}
+          <div className="absolute bottom-0 left-0 right-0 z-10 p-6 pb-7">
+            <h1
+              className="text-[2rem] leading-[1.2] tracking-tight text-white"
+              style={{ fontWeight: 300 }}
+            >
+              {greeting}, 정민
             </h1>
+            <p className="text-white/60 text-sm mt-1">5°C · Light rain</p>
           </div>
         </div>
 
         {/* ── 3. BOTTOM BUTTONS ── */}
-        <div className="relative z-10 px-4 pb-10 md:pb-8 pt-0 space-y-2.5">
+        <div className="relative z-10 px-4 pb-10 md:pb-8 pt-2 space-y-2">
           {/* Row 1 — 2 columns */}
-          <div className="grid grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-2 gap-2">
             <BottomButton
               href="/workflow"
               icon={<MousePointerClick size={22} strokeWidth={1.75} />}
@@ -260,7 +240,7 @@ export default function Home() {
           </div>
 
           {/* Row 2 — 3 columns */}
-          <div className="grid grid-cols-3 gap-2.5">
+          <div className="grid grid-cols-3 gap-2">
             <BottomButton
               href="/gallery"
               icon={<GalleryHorizontal size={22} strokeWidth={1.75} />}

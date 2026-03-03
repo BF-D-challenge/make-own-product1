@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Send } from "lucide-react";
 import Link from "next/link";
 import type { ChatMessage } from "@/app/api/chat/route";
+import { useAuth } from "@/components/AuthProvider";
 
 const NOISE_SVG = `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`;
 
@@ -78,6 +79,7 @@ function Bubble({ msg }: { msg: ChatMessage }) {
 }
 
 export default function ChatPage() {
+  const { user } = useAuth();
   const [history, setHistory] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -102,7 +104,7 @@ export default function ChatPage() {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text, history }),
+        body: JSON.stringify({ message: text, history, userId: user?.id }),
       });
       const data = await res.json();
       if (data.message) {
