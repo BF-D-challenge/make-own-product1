@@ -33,6 +33,45 @@ async function sendIMessage(to: string, body: string): Promise<void> {
   await execFileAsync("osascript", ["-e", script]);
 }
 
+// ── CoolSMS ──────────────────────────────────────────────────────────────────
+import { createHmac, randomBytes } from "crypto";
+
+function coolsmsAuthHeader(): string {
+  const apiKey = process.env.COOLSMS_API_KEY!;
+  const apiSecret = process.env.COOLSMS_API_SECRET!;
+  const date = new Date().toISOString();
+  const salt = randomBytes(8).toString("hex"); // 16자 hex
+  const signature = createHmac("sha256", apiSecret)
+    .update(date + salt)
+    .digest("hex");
+  return `HMAC-SHA256 apiKey=${apiKey}, date=${date}, salt=${salt}, signature=${signature}`;
+}
+
+export async function sendViaCoolSMS(to: string, body: string): Promise<void> {
+  const from = process.env.COOLSMS_SENDER_NUMBER;
+  if (!process.env.COOLSMS_API_KEY || !process.env.COOLSMS_API_SECRET || !from) {
+    throw new Error("CoolSMS credentials not configured");
+  }
+
+  // CoolSMS: SMS ≤ 90 bytes (한글 45자), 초과 시 LMS
+  const byteLen = Buffer.byteLength(body, "utf8");
+  const type = byteLen <= 90 ? "SMS" : "LMS";
+
+  const res = await fetch("https://api.coolsms.co.kr/messages/v4/send", {
+    method: "POST",
+    headers: {
+      Authorization: coolsmsAuthHeader(),
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ message: { to, from, text: body, type } }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(`CoolSMS error: ${err.errorCode} ${err.errorMessage}`);
+  }
+}
+
 // ── Public types ─────────────────────────────────────────────────────────────
 export interface SendSMSParams {
   workflowId: string;
@@ -68,15 +107,14 @@ export async function generateAndSendSMS({
     // Step 1 — Generate with Claude
     messageBody = await generateSMSMessage(messagePrompt);
 
-    // Step 2 — Send
-    const isMac = process.platform === "darwin";
-    if (isMac) {
+    // Step 2 — Send (CoolSMS on Vercel, iMessage on macOS)
+    const hasCoolSMS = !!(process.env.COOLSMS_API_KEY && process.env.COOLSMS_SENDER_NUMBER);
+    if (hasCoolSMS) {
+      await sendViaCoolSMS(recipientPhone, messageBody);
+    } else if (process.platform === "darwin") {
       await sendIMessage(recipientPhone, messageBody);
     } else {
-      // TODO: replace with Twilio/CoolSMS for Vercel deployment
-      throw new Error(
-        "iMessage is only available on macOS. Configure Twilio for server deployment."
-      );
+      throw new Error("No SMS provider configured. Set COOLSMS env vars.");
     }
 
     status = "sent";

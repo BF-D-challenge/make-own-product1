@@ -7,8 +7,6 @@ const NOISE_SVG = `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='h
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
-  const [magicLinkEmail, setMagicLinkEmail] = useState("");
-  const [magicLinkSent, setMagicLinkSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function signInWithGoogle() {
@@ -25,26 +23,6 @@ export default function LoginPage() {
       setError(error.message);
       setLoading(false);
     }
-  }
-
-  async function sendMagicLink(e: React.FormEvent) {
-    e.preventDefault();
-    if (!magicLinkEmail.trim()) return;
-    setLoading(true);
-    setError(null);
-    const supabase = createBrowserClient();
-    const { error } = await supabase.auth.signInWithOtp({
-      email: magicLinkEmail.trim(),
-      options: {
-        emailRedirectTo: `${location.origin}/auth/callback`,
-      },
-    });
-    if (error) {
-      setError(error.message);
-    } else {
-      setMagicLinkSent(true);
-    }
-    setLoading(false);
   }
 
   return (
@@ -97,71 +75,26 @@ export default function LoginPage() {
               "0 4px 32px rgba(14,165,233,0.1), inset 0 1px 0 rgba(255,255,255,0.6)",
           }}
         >
-          {magicLinkSent ? (
-            <div className="text-center py-4">
-              <div className="text-3xl mb-3">📬</div>
-              <p className="text-slate-800 font-semibold mb-1">
-                메일을 확인해줘!
-              </p>
-              <p className="text-slate-500 text-sm">
-                {magicLinkEmail}로 로그인 링크를 보냈어.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <p className="text-slate-600 text-sm text-center mb-5">
-                로그인하고 BF.D와 대화를 시작해봐
-              </p>
+          <p className="text-slate-600 text-sm text-center mb-5">
+            로그인하고 BF.D와 대화를 시작해봐
+          </p>
 
-              {/* Google OAuth */}
-              <button
-                onClick={signInWithGoogle}
-                disabled={loading}
-                className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-2xl font-semibold text-sm transition-all active:scale-[0.98] disabled:opacity-50"
-                style={{
-                  background:
-                    "linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%)",
-                  boxShadow: "0 4px 18px rgba(14,165,233,0.3)",
-                  color: "white",
-                }}
-              >
-                <GoogleIcon />
-                Google로 로그인
-              </button>
+          <button
+            onClick={signInWithGoogle}
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-2xl font-semibold text-sm transition-all active:scale-[0.98] disabled:opacity-50"
+            style={{
+              background: "linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%)",
+              boxShadow: "0 4px 18px rgba(14,165,233,0.3)",
+              color: "white",
+            }}
+          >
+            <GoogleIcon />
+            {loading ? "로그인 중..." : "Google로 로그인"}
+          </button>
 
-              {/* Divider */}
-              <div className="flex items-center gap-3 py-1">
-                <div className="flex-1 h-px bg-slate-200/70" />
-                <span className="text-slate-400 text-xs">또는</span>
-                <div className="flex-1 h-px bg-slate-200/70" />
-              </div>
-
-              {/* Magic link */}
-              <form onSubmit={sendMagicLink} className="space-y-2">
-                <input
-                  type="email"
-                  placeholder="이메일 주소"
-                  value={magicLinkEmail}
-                  onChange={(e) => setMagicLinkEmail(e.target.value)}
-                  className="w-full px-4 py-3 rounded-2xl text-sm bg-white/60 border border-white/70 outline-none focus:border-sky-300 text-slate-700 placeholder:text-slate-400 transition-colors"
-                />
-                <button
-                  type="submit"
-                  disabled={loading || !magicLinkEmail.trim()}
-                  className="w-full py-3 px-4 rounded-2xl font-semibold text-sm text-sky-600 transition-all active:scale-[0.98] disabled:opacity-50"
-                  style={{
-                    background: "rgba(224,242,254,0.8)",
-                    border: "1px solid rgba(186,230,253,0.7)",
-                  }}
-                >
-                  이메일 링크 받기
-                </button>
-              </form>
-
-              {error && (
-                <p className="text-red-500 text-xs text-center">{error}</p>
-              )}
-            </div>
+          {error && (
+            <p className="text-red-500 text-xs text-center mt-3">{error}</p>
           )}
         </div>
       </div>

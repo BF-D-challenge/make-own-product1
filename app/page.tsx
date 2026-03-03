@@ -252,7 +252,11 @@ export default function Home() {
               label="Mail"
             />
             <BottomButton
-              href="/chat"
+              href={
+                process.env.NEXT_PUBLIC_COOLSMS_SENDER
+                  ? `sms:${process.env.NEXT_PUBLIC_COOLSMS_SENDER}`
+                  : "/chat"
+              }
               icon={<MessageCircle size={22} strokeWidth={1.75} />}
               label="Text BF.D"
               primary
