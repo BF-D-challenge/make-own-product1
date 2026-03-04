@@ -105,7 +105,12 @@ export function WorkflowModal({
   }
 
   function addRecipient() {
-    const phone = form.phoneInput.trim();
+    const raw = form.phoneInput.trim();
+    if (!raw) return;
+    // Normalize: keep leading +, strip all non-digits elsewhere
+    const phone = raw.startsWith("+")
+      ? "+" + raw.slice(1).replace(/\D/g, "")
+      : raw.replace(/\D/g, "");
     if (!phone || form.recipients.includes(phone)) return;
     set("recipients", [...form.recipients, phone]);
     set("phoneInput", "");

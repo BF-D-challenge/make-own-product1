@@ -11,6 +11,9 @@ import {
   Pencil,
   Trash2,
   CalendarClock,
+  Send,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react";
 import type { Workflow, TriggerType } from "@/lib/supabase";
 
@@ -77,8 +80,32 @@ export function WorkflowCard({
   onDelete,
 }: WorkflowCardProps) {
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sendResult, setSendResult] = useState<"success" | "error" | null>(null);
 
   const summary = triggerSummary(workflow.trigger_type, workflow.trigger_config);
+
+  async function handleSendNow() {
+    if (sending || workflow.recipients.length === 0) return;
+    setSending(true);
+    setSendResult(null);
+    let allSuccess = true;
+    for (const phone of workflow.recipients) {
+      const res = await fetch("/api/send-sms", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          workflowId: workflow.id,
+          recipientPhone: phone,
+          messagePrompt: workflow.message_prompt,
+        }),
+      });
+      if (!res.ok) allSuccess = false;
+    }
+    setSendResult(allSuccess ? "success" : "error");
+    setSending(false);
+    setTimeout(() => setSendResult(null), 4000);
+  }
 
   return (
     <div
@@ -137,6 +164,26 @@ export function WorkflowCard({
         </span>
 
         <div className="flex items-center gap-3">
+          {/* Send Now */}
+          <button
+            onClick={handleSendNow}
+            disabled={sending || workflow.recipients.length === 0}
+            className="p-1.5 rounded-lg transition-colors disabled:opacity-40"
+            style={{
+              color: sendResult === "success" ? "#16a34a" : sendResult === "error" ? "#dc2626" : "#64748b",
+            }}
+            aria-label="Send now"
+            title="Send now"
+          >
+            {sendResult === "success" ? (
+              <CheckCircle2 size={14} />
+            ) : sendResult === "error" ? (
+              <XCircle size={14} />
+            ) : (
+              <Send size={14} className={sending ? "animate-pulse" : ""} />
+            )}
+          </button>
+
           {/* Edit */}
           <button
             onClick={() => onEdit(workflow)}
