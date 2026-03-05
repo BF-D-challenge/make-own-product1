@@ -208,8 +208,7 @@ export default function ChatPage() {
         {/* Input */}
         <div
           className="px-4 pt-3"
-          style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 1.5rem)" }}
-          style={{ borderTop: "1px solid rgba(255,255,255,0.5)" }}
+          style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 1.5rem)", borderTop: "1px solid rgba(255,255,255,0.5)" }}
         >
           <div
             className="flex items-end gap-2 rounded-3xl px-4 py-2"
