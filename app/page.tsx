@@ -116,7 +116,7 @@ export default function Home() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center relative overflow-hidden"
+      className="h-dvh flex items-center justify-center relative overflow-hidden"
       style={{ backgroundColor: "#e0f2fe" }}
     >
       {/* Global noise texture overlay */}
@@ -136,14 +136,17 @@ export default function Home() {
       <div
         className="relative w-full max-w-md flex flex-col md:rounded-3xl md:overflow-hidden"
         style={{
-          minHeight: "100svh",
+          height: "100dvh",
           backgroundColor: "#e0f2fe",
           boxShadow:
             "0 0 0 1px rgba(148,163,184,0.08), 0 32px 80px rgba(14,165,233,0.12), 0 8px 32px rgba(0,0,0,0.06)",
         }}
       >
         {/* ── 1. TOP BAR ── */}
-        <div className="relative z-10 flex items-center justify-between px-5 pt-14 pb-3 md:pt-8">
+        <div
+          className="relative z-10 flex items-center justify-between px-5 pb-3"
+          style={{ paddingTop: "calc(env(safe-area-inset-top) + 1.5rem)" }}
+        >
           <BFDLogo />
           <span className="text-sm font-medium text-slate-500 tabular-nums">
             {dateStr}
@@ -224,7 +227,10 @@ export default function Home() {
         </div>
 
         {/* ── 3. BOTTOM BUTTONS ── */}
-        <div className="relative z-10 px-4 pb-10 md:pb-8 pt-2 space-y-2">
+        <div
+          className="relative z-10 px-4 pt-2 space-y-2"
+          style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 2rem)" }}
+        >
           {/* Row 1 — 2 columns */}
           <div className="grid grid-cols-2 gap-2">
             <BottomButton

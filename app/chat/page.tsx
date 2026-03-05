@@ -130,7 +130,7 @@ export default function ChatPage() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center relative"
+      className="h-dvh flex items-center justify-center relative"
       style={{ backgroundColor: "#e0f2fe" }}
     >
       {/* Noise overlay */}
@@ -150,14 +150,17 @@ export default function ChatPage() {
       <div
         className="relative w-full max-w-md flex flex-col md:rounded-3xl md:overflow-hidden"
         style={{
-          minHeight: "100svh",
+          height: "100dvh",
           backgroundColor: "#e0f2fe",
           boxShadow:
             "0 0 0 1px rgba(148,163,184,0.08), 0 32px 80px rgba(14,165,233,0.12), 0 8px 32px rgba(0,0,0,0.06)",
         }}
       >
         {/* Header */}
-        <div className="flex items-center gap-3 px-5 pt-14 pb-4 md:pt-8">
+        <div
+          className="flex items-center gap-3 px-5 pb-4"
+          style={{ paddingTop: "calc(env(safe-area-inset-top) + 1.5rem)" }}
+        >
           <Link
             href="/"
             className="p-2 -ml-2 rounded-xl text-slate-500 hover:text-slate-700 hover:bg-white/50 transition-colors"
@@ -204,7 +207,8 @@ export default function ChatPage() {
 
         {/* Input */}
         <div
-          className="px-4 pb-10 md:pb-6 pt-3"
+          className="px-4 pt-3"
+          style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 1.5rem)" }}
           style={{ borderTop: "1px solid rgba(255,255,255,0.5)" }}
         >
           <div

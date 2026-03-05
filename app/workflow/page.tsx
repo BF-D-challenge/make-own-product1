@@ -163,7 +163,7 @@ export default function WorkflowPage() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center relative"
+      className="h-dvh flex items-center justify-center relative"
       style={{ backgroundColor: "#e0f2fe" }}
     >
       {/* Noise overlay */}
@@ -183,14 +183,17 @@ export default function WorkflowPage() {
       <div
         className="relative w-full max-w-md flex flex-col md:rounded-3xl md:overflow-hidden"
         style={{
-          minHeight: "100svh",
+          height: "100dvh",
           backgroundColor: "#e0f2fe",
           boxShadow:
             "0 0 0 1px rgba(148,163,184,0.08), 0 32px 80px rgba(14,165,233,0.12), 0 8px 32px rgba(0,0,0,0.06)",
         }}
       >
         {/* ── Header ── */}
-        <div className="flex items-center justify-between px-5 pt-14 pb-4 md:pt-8">
+        <div
+          className="flex items-center justify-between px-5 pb-4"
+          style={{ paddingTop: "calc(env(safe-area-inset-top) + 1.5rem)" }}
+        >
           <div className="flex items-center gap-3">
             <Link
               href="/"
@@ -222,7 +225,7 @@ export default function WorkflowPage() {
         {!supabaseReady && <ConfigBanner />}
 
         {/* ── Content ── */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col overflow-y-auto">
           {loading ? (
             // Skeleton
             <div className="px-4 pt-2 space-y-3">
@@ -237,7 +240,10 @@ export default function WorkflowPage() {
           ) : workflows.length === 0 ? (
             <EmptyState onAdd={openAdd} />
           ) : (
-            <div className="px-4 pt-2 pb-10 space-y-3">
+            <div
+              className="px-4 pt-2 space-y-3"
+              style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 2rem)" }}
+            >
               {workflows.map((workflow) => (
                 <WorkflowCard
                   key={workflow.id}
