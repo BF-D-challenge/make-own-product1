@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { anthropic } from "@/lib/anthropic";
 import { createClient } from "@supabase/supabase-js";
 import { sendViaCoolSMS } from "@/lib/sms";
+import { createVerifyToken } from "@/lib/verifyToken";
 
 function getSupabaseAdmin() {
   return createClient(
@@ -19,6 +20,21 @@ export async function POST(req: NextRequest) {
     const body = data.text as string;
 
     if (!from || !body?.trim()) {
+      return NextResponse.json({ ok: true });
+    }
+
+    // Onboarding trigger: "안녕 베프디" → send verify link
+    const normalized = body.trim().replace(/\s/g, "");
+    if (normalized.includes("안녕베프디")) {
+      const token = createVerifyToken(from);
+      const siteUrl =
+        process.env.NEXT_PUBLIC_SITE_URL ||
+        (process.env.VERCEL_URL
+          ? `https://${process.env.VERCEL_URL}`
+          : "http://localhost:3000");
+      const verifyUrl = `${siteUrl}/verify?token=${token}`;
+      const welcomeMsg = `안녕! 나 베프디야 😊\n아래 링크를 눌러서 구글로 로그인하면 바로 시작할 수 있어!\n${verifyUrl}`;
+      await sendViaCoolSMS(from, welcomeMsg);
       return NextResponse.json({ ok: true });
     }
 
