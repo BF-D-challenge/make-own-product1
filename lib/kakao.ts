@@ -10,7 +10,9 @@ export interface KakaoUser {
 
 export interface KakaoUserRequest {
   timezone: string;
-  params: Record<string, string>;
+  params: Record<string, string> & {
+    callbackUrl?: string; // AI 챗봇 전환 ON 시 포함
+  };
   block: { id: string; name: string };
   utterance: string;
   lang: string;
