@@ -6,6 +6,7 @@ import {
   verifyKakaoSignature,
   type KakaoWebhookPayload,
 } from "@/lib/kakao";
+import { BFD_SYSTEM_PROMPT } from "@/lib/prompts";
 import type Anthropic from "@anthropic-ai/sdk";
 
 export const runtime = "nodejs";
@@ -17,13 +18,7 @@ function getSupabaseAdmin() {
   );
 }
 
-const SYSTEM_PROMPT =
-  "You are BF.D — a warm, thoughtful AI best friend communicating via KakaoTalk. " +
-  "Be caring, funny, and genuinely interested in the user's life. " +
-  "Keep responses conversational and natural, like chatting with a close friend on KakaoTalk. " +
-  "Be supportive, ask follow-up questions, and remember context from the conversation. " +
-  "Respond in the same language the user uses (Korean or English). " +
-  "Keep replies concise — 1 to 4 sentences is ideal for a chat context.";
+const SYSTEM_PROMPT = BFD_SYSTEM_PROMPT + "\n카카오톡 채팅이니까 1-4문장으로 짧게.";
 
 const HISTORY_LIMIT = 20;
 const MAX_TOKENS = 400;

@@ -3,6 +3,7 @@ import { anthropic } from "@/lib/anthropic";
 import { createClient } from "@supabase/supabase-js";
 import { sendViaTwilio, sendViaCoolSMS } from "@/lib/sms";
 import { createVerifyToken } from "@/lib/verifyToken";
+import { BFD_SYSTEM_PROMPT } from "@/lib/prompts";
 
 function getSupabaseAdmin() {
   return createClient(
@@ -77,11 +78,7 @@ export async function POST(req: NextRequest) {
     const response = await anthropic.messages.create({
       model: "claude-haiku-4-5-20251001",
       max_tokens: 300,
-      system:
-        "You are BF.D — a warm, caring AI best friend. " +
-        "You're texting via SMS so keep replies short (1-3 sentences). " +
-        "Be natural, funny, and genuinely interested. " +
-        "Respond in the same language the user uses (Korean or English).",
+      system: BFD_SYSTEM_PROMPT + "\nSMS라 1-3문장으로 짧게.",
       messages: [...history, { role: "user", content: body.trim() }],
     });
 
