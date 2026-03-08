@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { anthropic } from "@/lib/anthropic";
 import { createClient } from "@supabase/supabase-js";
-import { sendViaCoolSMS } from "@/lib/sms";
+import { sendViaTwilio, sendViaCoolSMS } from "@/lib/sms";
 import { createVerifyToken } from "@/lib/verifyToken";
 
 function getSupabaseAdmin() {
@@ -11,16 +11,34 @@ function getSupabaseAdmin() {
   );
 }
 
-// CoolSMS sends JSON POST to this endpoint when a message is received
+function sendSMS(to: string, body: string): Promise<void> {
+  if (process.env.TWILIO_ACCOUNT_SID) return sendViaTwilio(to, body);
+  return sendViaCoolSMS(to, body);
+}
+
+// Twilio sends application/x-www-form-urlencoded; CoolSMS sends JSON
 export async function POST(req: NextRequest) {
   try {
-    const data = await req.json();
-    // CoolSMS webhook payload: { from, text, type, ... }
-    const from = data.from as string;
-    const body = data.text as string;
+    let from: string;
+    let body: string;
+
+    const raw = await req.text();
+    const params = new URLSearchParams(raw);
+    if (params.has("From")) {
+      // Twilio: application/x-www-form-urlencoded
+      from = params.get("From") ?? "";
+      body = params.get("Body") ?? "";
+    } else {
+      // CoolSMS: JSON
+      const data = JSON.parse(raw);
+      from = data.from as string;
+      body = data.text as string;
+    }
 
     if (!from || !body?.trim()) {
-      return NextResponse.json({ ok: true });
+      return new NextResponse("<Response></Response>", {
+        headers: { "Content-Type": "text/xml" },
+      });
     }
 
     // Onboarding trigger: "안녕 베프디" → send verify link
@@ -34,8 +52,10 @@ export async function POST(req: NextRequest) {
           : "http://localhost:3000");
       const verifyUrl = `${siteUrl}/verify?token=${token}`;
       const welcomeMsg = `안녕! 나 베프디야 😊\n아래 링크를 눌러서 구글로 로그인하면 바로 시작할 수 있어!\n${verifyUrl}`;
-      await sendViaCoolSMS(from, welcomeMsg);
-      return NextResponse.json({ ok: true });
+      await sendSMS(from, welcomeMsg);
+      return new NextResponse("<Response></Response>", {
+        headers: { "Content-Type": "text/xml" },
+      });
     }
 
     const supabase = getSupabaseAdmin();
@@ -68,8 +88,7 @@ export async function POST(req: NextRequest) {
     const reply =
       response.content[0].type === "text" ? response.content[0].text : "";
 
-    // Send reply via CoolSMS
-    await sendViaCoolSMS(from, reply);
+    await sendSMS(from, reply);
 
     // Log conversation to Supabase
     await supabase.from("chat_logs").insert([
@@ -77,9 +96,13 @@ export async function POST(req: NextRequest) {
       { user_id: from, role: "assistant", content: reply },
     ]);
 
-    return NextResponse.json({ ok: true });
+    return new NextResponse("<Response></Response>", {
+      headers: { "Content-Type": "text/xml" },
+    });
   } catch (err) {
     console.error("[POST /api/sms/incoming]", err);
-    return NextResponse.json({ ok: true }); // always return 200 to CoolSMS
+    return new NextResponse("<Response></Response>", {
+      headers: { "Content-Type": "text/xml" },
+    });
   }
 }

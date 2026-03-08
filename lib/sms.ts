@@ -33,6 +33,35 @@ async function sendIMessage(to: string, body: string): Promise<void> {
   await execFileAsync("osascript", ["-e", script]);
 }
 
+// ── Twilio ───────────────────────────────────────────────────────────────────
+
+export async function sendViaTwilio(to: string, body: string): Promise<void> {
+  const sid = process.env.TWILIO_ACCOUNT_SID;
+  const token = process.env.TWILIO_AUTH_TOKEN;
+  const from = process.env.TWILIO_PHONE_NUMBER;
+  if (!sid || !token || !from) {
+    throw new Error("Twilio credentials not configured");
+  }
+
+  const params = new URLSearchParams({ To: to, From: from, Body: body });
+  const res = await fetch(
+    `https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${sid}:${token}`).toString("base64")}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: params.toString(),
+    }
+  );
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(`Twilio error: ${err.code} ${err.message}`);
+  }
+}
+
 // ── CoolSMS ──────────────────────────────────────────────────────────────────
 import { createHmac, randomBytes } from "crypto";
 
@@ -107,14 +136,17 @@ export async function generateAndSendSMS({
     // Step 1 — Generate with Claude
     messageBody = await generateSMSMessage(messagePrompt);
 
-    // Step 2 — Send (CoolSMS on Vercel, iMessage on macOS)
+    // Step 2 — Send (Twilio → CoolSMS → iMessage)
+    const hasTwilio = !!(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER);
     const hasCoolSMS = !!(process.env.COOLSMS_API_KEY && process.env.COOLSMS_SENDER_NUMBER);
-    if (hasCoolSMS) {
+    if (hasTwilio) {
+      await sendViaTwilio(recipientPhone, messageBody);
+    } else if (hasCoolSMS) {
       await sendViaCoolSMS(recipientPhone, messageBody);
     } else if (process.platform === "darwin") {
       await sendIMessage(recipientPhone, messageBody);
     } else {
-      throw new Error("No SMS provider configured. Set COOLSMS env vars.");
+      throw new Error("No SMS provider configured. Set TWILIO or COOLSMS env vars.");
     }
 
     status = "sent";
