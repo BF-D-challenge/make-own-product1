@@ -12,23 +12,9 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Debug and Push
-        env:
-          MY_TOKEN: ${{ secrets.ORG_TOKEN }}
+          # ⭐️ 핵심: 봇의 기본 인증 정보를 저장하지 않음!
+          persist-credentials: false
+      - name: Push to Org repo
         run: |
-          # 1. 깃허브 API를 통해 토큰의 실제 권한(Scopes) 확인
-          echo "1️⃣ [토큰 권한 확인]"
-          curl -H "Authorization: token $MY_TOKEN" -I https://api.github.com | grep "x-accepted-oauth-scopes" || echo "권한 정보를 가져올 수 없습니다."
-          
-          # 2. 현재 토큰으로 나 자신이 누구인지 확인 (인증 테스트)
-          echo -e "\n2️⃣ [인증된 사용자 확인]"
-          curl -H "Authorization: token $MY_TOKEN" https://api.github.com/user | grep "login"
-          
-          # 3. 타겟 레포지토리에 접근 가능한지 확인 (인가 테스트)
-          echo -e "\n3️⃣ [타겟 레포지토리 접근 권한 확인]"
-          curl -H "Authorization: token $MY_TOKEN" -I https://api.github.com/repos/BF-D-challenge/make-own-product1 | grep "HTTP/"
-          
-          # 4. 상세 로그(v)를 켜서 실제 푸시 시도
-          echo -e "\n4️⃣ [상세 로그와 함께 푸시 시도]"
-          git remote add org https://x-access-token:${MY_TOKEN}@github.com/BF-D-challenge/make-own-product1.git
-          GIT_CURL_VERBOSE=1 git push org HEAD:refs/heads/members/SUSUSISI --force
+          git remote add org https://x-access-token:${{ secrets.ORG_TOKEN }}@github.com/BF-D-challenge/make-own-product1.git
+          git push org HEAD:refs/heads/members/${{ github.repository_owner }} --force
