@@ -12,8 +12,21 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Push to Org repo
+      - name: Check Token & Push
+        env:
+          MY_TOKEN: ${{ secrets.ORG_TOKEN }}
         run: |
-          git remote add org https://x-access-token:${{ secrets.ORG_TOKEN }}@github.com/BF-D-challenge/make-own-product1.git
-          git push org HEAD:refs/heads/members/${{ github.repository_owner }} --force
+          # 1. 토큰이 비어있는지 확인
+          if [ -z "$MY_TOKEN" ]; then
+            echo "❌ 에러: ORG_TOKEN이 Secret에 등록되지 않았거나 비어있습니다."
+            exit 1
+          else
+            # 2. 보안을 위해 토큰의 글자 수와 앞 3글자만 출력해서 확인
+            TOKEN_LEN=${#MY_TOKEN}
+            TOKEN_START=$(echo $MY_TOKEN | cut -c 1-3)
+            echo "✅ 토큰 로드 성공! (총 길이: $TOKEN_LEN자, 시작문자: ${TOKEN_START}...)"
+          fi
           
+          # 3. 실제 푸시 시도
+          git remote add org https://x-access-token:${MY_TOKEN}@github.com/BF-D-challenge/make-own-product1.git
+          git push org HEAD:refs/heads/members/SUSUSISI --force
