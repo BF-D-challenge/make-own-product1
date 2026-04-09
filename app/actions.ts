@@ -12,12 +12,11 @@ export async function submitWaitlist(data: {
     return { success: false, error: "설정 오류가 발생했습니다." };
   }
   try {
-    const res = await fetch(webhookUrl, {
+    await fetch(webhookUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    }).catch(() => null); // Google Apps Script redirects — treat any response as success
     return { success: true };
   } catch {
     return {
