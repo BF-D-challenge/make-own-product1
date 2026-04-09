@@ -12,12 +12,17 @@ export async function submitWaitlist(data: {
     return { success: false, error: "설정 오류가 발생했습니다." };
   }
   try {
-    await fetch(webhookUrl, {
+    const res = await fetch(webhookUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
-    }).catch(() => null); // Google Apps Script redirects — treat any response as success
-    return { success: true };
+      redirect: "manual", // GAS returns 302 after running doPost — stop here
+    });
+    // 2xx = success, 3xx = GAS redirect after execution (also success)
+    if (res.status >= 200 && res.status < 400) {
+      return { success: true };
+    }
+    throw new Error(`HTTP ${res.status}`);
   } catch {
     return {
       success: false,
