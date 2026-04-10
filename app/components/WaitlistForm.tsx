@@ -27,14 +27,17 @@ export default function WaitlistForm() {
 
     setIsPending(true);
     try {
-      // Call GAS directly from the browser with no-cors to avoid redirect/auth issues
-      const url = new URL("https://script.google.com/macros/s/AKfycbyaPA7AmuqAB0gQwdmnAVvL5ke7GG2jCYHawdxOeVOnUK6SUx57zbCZ4A5gmvVW6mzFjQ/exec");
-      url.searchParams.set("hotelName", hotelName);
-      url.searchParams.set("ownerName", ownerName);
-      url.searchParams.set("phone", phone);
-      // Regular fetch: GET request reaches GAS and doGet runs, CORS error on response is expected
-      await fetch(url.toString()).catch(() => {});
-      setStatus("success");
+      const res = await fetch("/api/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ hotelName, ownerName, phone }),
+      });
+      const result = await res.json();
+      if (result.success) {
+        setStatus("success");
+      } else {
+        setStatus("error");
+      }
     } catch {
       setStatus("error");
     } finally {
@@ -49,14 +52,7 @@ export default function WaitlistForm() {
         style={{ alignItems: "center", justifyContent: "center" }}
       >
         <div style={{ textAlign: "center" }}>
-          <p
-            style={{
-              fontSize: "22px",
-              fontWeight: 700,
-              color: "#1a1a1a",
-              marginBottom: "12px",
-            }}
-          >
+          <p style={{ fontSize: "22px", fontWeight: 700, color: "#1a1a1a", marginBottom: "12px" }}>
             신청이 완료되었습니다! 🎉
           </p>
           <p style={{ fontSize: "14px", color: "#999", lineHeight: 1.6 }}>
@@ -83,21 +79,13 @@ export default function WaitlistForm() {
       </div>
 
       <div className="privacy-box">
-        <input
-          type="checkbox"
-          className="checkbox"
-          id="privacy-agree"
-          ref={agreeRef}
-        />
+        <input type="checkbox" className="checkbox" id="privacy-agree" ref={agreeRef} />
         <div className="privacy-text">
           <div className="title">(필수) 개인정보 수집 및 이용 동의</div>
           <div className="items">
             <div>• 수집 목적: 서비스 오픈 안내 및 입점 상담</div>
             <div>• 수집 항목: 숙소명, 성함, 연락처</div>
-            <div>
-              • 보유 기간:{" "}
-              <span className="bold">오픈 안내 후 1개월 이내 파기</span>
-            </div>
+            <div>• 보유 기간: <span className="bold">오픈 안내 후 1개월 이내 파기</span></div>
           </div>
         </div>
       </div>
