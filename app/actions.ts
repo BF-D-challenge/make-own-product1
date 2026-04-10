@@ -8,22 +8,20 @@ export async function submitWaitlist(data: {
   phone: string;
 }): Promise<Result> {
   const webhookUrl = process.env.GOOGLE_SHEET_WEBHOOK_URL;
-  console.log("[submitWaitlist] webhookUrl:", webhookUrl ? "SET" : "NOT SET");
-
   if (!webhookUrl) {
     return { success: false, error: "설정 오류가 발생했습니다." };
   }
   try {
-    const res = await fetch(webhookUrl, {
+    // redirect:'manual' stops before following GAS's 302 redirect.
+    // doPost already runs before the redirect is issued, so data is written.
+    await fetch(webhookUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
-      redirect: "follow",
+      redirect: "manual",
     });
-    console.log("[submitWaitlist] response status:", res.status, "type:", res.type);
     return { success: true };
-  } catch (e) {
-    console.error("[submitWaitlist] fetch error:", e);
+  } catch {
     return {
       success: false,
       error: "전송에 실패했습니다. 잠시 후 다시 시도해주세요.",
