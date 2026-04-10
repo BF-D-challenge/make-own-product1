@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef } from "react";
+import { submitWaitlist } from "../actions"; // 방금 만든 서버 액션을 불러옵니다.
 
 export default function WaitlistForm() {
   const [isPending, setIsPending] = useState(false);
@@ -7,16 +8,16 @@ export default function WaitlistForm() {
 
   const hotelRef = useRef<HTMLInputElement>(null);
   const ownerRef = useRef<HTMLInputElement>(null);
-  const phoneRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null); // phone에서 email로 변경
   const agreeRef = useRef<HTMLInputElement>(null);
 
   async function handleSubmit() {
     const hotelName = hotelRef.current?.value.trim() ?? "";
     const ownerName = ownerRef.current?.value.trim() ?? "";
-    const phone = phoneRef.current?.value.trim() ?? "";
+    const email = emailRef.current?.value.trim() ?? "";
     const agreed = agreeRef.current?.checked ?? false;
 
-    if (!hotelName || !ownerName || !phone) {
+    if (!hotelName || !ownerName || !email) {
       alert("모든 항목을 입력해 주세요.");
       return;
     }
@@ -27,12 +28,9 @@ export default function WaitlistForm() {
 
     setIsPending(true);
     try {
-      const res = await fetch("/api/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ hotelName, ownerName, phone }),
-      });
-      const result = await res.json();
+      // 해결 포인트: 브라우저가 직접 쏘는게 아니라 '서버 액션'을 통해 안전하게 보냅니다.
+      const result = await submitWaitlist({ hotelName, ownerName, email });
+      
       if (result.success) {
         setStatus("success");
       } else {
@@ -56,7 +54,7 @@ export default function WaitlistForm() {
             신청이 완료되었습니다! 🎉
           </p>
           <p style={{ fontSize: "14px", color: "#999", lineHeight: 1.6 }}>
-            오픈 시 가장 먼저 혜택 안내를 드리겠습니다.
+            24시간 내에 작성해주신 이메일로 안내를 드리겠습니다.
           </p>
         </div>
       </div>
@@ -67,15 +65,15 @@ export default function WaitlistForm() {
     <div className="waitlist-form-card">
       <div className="form-field">
         <label htmlFor="hotel-name">숙소명</label>
-        <input type="text" id="hotel-name" ref={hotelRef} />
+        <input type="text" id="hotel-name" ref={hotelRef} placeholder="예: ZOOP 모텔" />
       </div>
       <div className="form-field">
         <label htmlFor="owner-name">사장님 성함</label>
-        <input type="text" id="owner-name" ref={ownerRef} />
+        <input type="text" id="owner-name" ref={ownerRef} placeholder="성함을 입력해주세요" />
       </div>
       <div className="form-field">
-        <label htmlFor="phone">연락처</label>
-        <input type="tel" id="phone" ref={phoneRef} />
+        <label htmlFor="email">이메일 연락처</label>
+        <input type="email" id="email" ref={emailRef} placeholder="example@email.com" />
       </div>
 
       <div className="privacy-box">
@@ -84,7 +82,7 @@ export default function WaitlistForm() {
           <div className="title">(필수) 개인정보 수집 및 이용 동의</div>
           <div className="items">
             <div>• 수집 목적: 서비스 오픈 안내 및 입점 상담</div>
-            <div>• 수집 항목: 숙소명, 성함, 연락처</div>
+            <div>• 수집 항목: 숙소명, 성함, 이메일</div>
             <div>• 보유 기간: <span className="bold">오픈 안내 후 1개월 이내 파기</span></div>
           </div>
         </div>
@@ -100,8 +98,8 @@ export default function WaitlistForm() {
       </button>
 
       {status === "error" && (
-        <p style={{ fontSize: "13px", color: "#ff5a00", textAlign: "center" }}>
-          전송에 실패했습니다. 잠시 후 다시 시도해주세요.
+        <p style={{ fontSize: "13px", color: "#ff5a00", textAlign: "center", marginTop: "12px" }}>
+          전송에 실패했습니다. 환경변수 세팅과 재배포를 확인해주세요.
         </p>
       )}
     </div>

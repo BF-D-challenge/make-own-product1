@@ -1,30 +1,29 @@
-"use server";
+'use server'
 
-type Result = { success: true } | { success: false; error: string };
-
-export async function submitWaitlist(data: {
-  hotelName: string;
-  ownerName: string;
-  phone: string;
-}): Promise<Result> {
+export async function submitWaitlist(data: { hotelName: string; ownerName: string; email: string }) {
   const webhookUrl = process.env.GOOGLE_SHEET_WEBHOOK_URL;
+
   if (!webhookUrl) {
-    return { success: false, error: "설정 오류가 발생했습니다." };
+    console.error("환경변수 GOOGLE_SHEET_WEBHOOK_URL이 설정되지 않았습니다.");
+    return { success: false };
   }
+
   try {
-    // redirect:'manual' stops before following GAS's 302 redirect.
-    // doPost already runs before the redirect is issued, so data is written.
-    await fetch(webhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    // 해결 포인트: method를 POST로 강제하고, 데이터를 JSON으로 예쁘게 포장해서 보냅니다.
+    const response = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8', // 구글 앱스 스크립트와의 통신 최적화
+      },
       body: JSON.stringify(data),
-      redirect: "manual",
     });
-    return { success: true };
-  } catch {
-    return {
-      success: false,
-      error: "전송에 실패했습니다. 잠시 후 다시 시도해주세요.",
-    };
+
+    if (response.ok) {
+      return { success: true };
+    }
+    return { success: false };
+  } catch (error) {
+    console.error("전송 에러:", error);
+    return { success: false };
   }
 }
