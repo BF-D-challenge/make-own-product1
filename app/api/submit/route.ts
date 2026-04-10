@@ -1,21 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 
+const GAS_URL =
+  "https://script.google.com/macros/s/AKfycbyaPA7AmuqAB0gQwdmnAVvL5ke7GG2jCYHawdxOeVOnUK6SUx57zbCZ4A5gmvVW6mzFjQ/exec";
+
 export async function POST(request: NextRequest) {
   const data = await request.json();
-  const webhookUrl =
-    "https://script.google.com/macros/s/AKfycbyaPA7AmuqAB0gQwdmnAVvL5ke7GG2jCYHawdxOeVOnUK6SUx57zbCZ4A5gmvVW6mzFjQ/exec";
+
+  // Use GET with query params — more reliable than POST with GAS
+  const params = new URLSearchParams({
+    hotelName: data.hotelName ?? "",
+    ownerName: data.ownerName ?? "",
+    phone: data.phone ?? "",
+  });
+  const url = `${GAS_URL}?${params.toString()}`;
 
   try {
-    const res = await fetch(webhookUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-      redirect: "follow",
-    });
-    console.log("[api/submit] GAS status:", res.status, "ok:", res.ok);
-    // GAS executes doPost before any redirect — treat any response as success
+    const res = await fetch(url, { redirect: "follow" });
+    console.log("[api/submit] GAS GET status:", res.status);
+    const text = await res.text();
+    console.log("[api/submit] GAS response:", text);
     return NextResponse.json({ success: true });
   } catch (e) {
     console.error("[api/submit] fetch error:", String(e));
