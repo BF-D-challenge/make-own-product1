@@ -31,7 +31,7 @@ export default function WaitlistForm() {
       await fetch(process.env.NEXT_PUBLIC_GOOGLE_SHEET_WEBHOOK_URL!, {
         method: "POST",
         mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "text/plain" },
         body: JSON.stringify({ hotelName, ownerName, phone }),
       });
       setStatus("success");
