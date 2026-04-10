@@ -4,26 +4,31 @@ export async function submitWaitlist(data: { hotelName: string; ownerName: strin
   const webhookUrl = process.env.GOOGLE_SHEET_WEBHOOK_URL;
 
   if (!webhookUrl) {
-    console.error("환경변수 GOOGLE_SHEET_WEBHOOK_URL이 설정되지 않았습니다.");
-    return { success: false };
+    return { success: false, error: "Vercel 환경변수(GOOGLE_SHEET_WEBHOOK_URL)가 없습니다." };
   }
 
   try {
-    // 해결 포인트: method를 POST로 강제하고, 데이터를 JSON으로 예쁘게 포장해서 보냅니다.
     const response = await fetch(webhookUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'text/plain;charset=utf-8', // 구글 앱스 스크립트와의 통신 최적화
+        'Content-Type': 'text/plain;charset=utf-8',
       },
       body: JSON.stringify(data),
     });
 
+    // 🚨 핵심: 구글이 돌려준 대답(텍스트)을 까보고 에러면 프론트로 보냅니다.
+    const responseText = await response.text();
+
+    if (responseText.includes("Error") || responseText.includes("Exception")) {
+      return { success: false, error: responseText };
+    }
+
     if (response.ok) {
       return { success: true };
+    } else {
+      return { success: false, error: "구글 시트 전송 실패 (상태코드: " + response.status + ")" };
     }
-    return { success: false };
-  } catch (error) {
-    console.error("전송 에러:", error);
-    return { success: false };
+  } catch (error: any) {
+    return { success: false, error: error.message || "네트워크 통신 에러" };
   }
 }

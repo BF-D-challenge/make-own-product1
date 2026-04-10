@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef } from "react";
-import { submitWaitlist } from "../actions"; // 방금 만든 서버 액션을 불러옵니다.
+import { submitWaitlist } from "../actions";
 
 export default function WaitlistForm() {
   const [isPending, setIsPending] = useState(false);
@@ -8,7 +8,7 @@ export default function WaitlistForm() {
 
   const hotelRef = useRef<HTMLInputElement>(null);
   const ownerRef = useRef<HTMLInputElement>(null);
-  const emailRef = useRef<HTMLInputElement>(null); // phone에서 email로 변경
+  const emailRef = useRef<HTMLInputElement>(null);
   const agreeRef = useRef<HTMLInputElement>(null);
 
   async function handleSubmit() {
@@ -28,12 +28,13 @@ export default function WaitlistForm() {
 
     setIsPending(true);
     try {
-      // 해결 포인트: 브라우저가 직접 쏘는게 아니라 '서버 액션'을 통해 안전하게 보냅니다.
       const result = await submitWaitlist({ hotelName, ownerName, email });
       
       if (result.success) {
         setStatus("success");
       } else {
+        // 🚨 여기에 진짜 구글 에러를 띄워주는 팝업창이 추가되었습니다!
+        alert("🚨 구글 에러 원인:\n" + result.error);
         setStatus("error");
       }
     } catch {
@@ -99,7 +100,7 @@ export default function WaitlistForm() {
 
       {status === "error" && (
         <p style={{ fontSize: "13px", color: "#ff5a00", textAlign: "center", marginTop: "12px" }}>
-          전송에 실패했습니다. 환경변수 세팅과 재배포를 확인해주세요.
+          전송에 실패했습니다. 에러 팝업창을 확인해 주세요.
         </p>
       )}
     </div>
