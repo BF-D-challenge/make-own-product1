@@ -32,7 +32,8 @@ export default function WaitlistForm() {
       url.searchParams.set("hotelName", hotelName);
       url.searchParams.set("ownerName", ownerName);
       url.searchParams.set("phone", phone);
-      await fetch(url.toString(), { mode: "no-cors" });
+      // Regular fetch: GET request reaches GAS and doGet runs, CORS error on response is expected
+      await fetch(url.toString()).catch(() => {});
       setStatus("success");
     } catch {
       setStatus("error");
