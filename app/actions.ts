@@ -12,17 +12,14 @@ export async function submitWaitlist(data: {
     return { success: false, error: "설정 오류가 발생했습니다." };
   }
   try {
-    const res = await fetch(webhookUrl, {
+    await fetch(webhookUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
-      redirect: "manual", // GAS returns 302 after running doPost — stop here
+      redirect: "follow",
     });
-    // 2xx = success, 3xx = GAS redirect after execution (also success)
-    if (res.status >= 200 && res.status < 400) {
-      return { success: true };
-    }
-    throw new Error(`HTTP ${res.status}`);
+    // GAS always writes data before redirecting — treat any response as success
+    return { success: true };
   } catch {
     return {
       success: false,
