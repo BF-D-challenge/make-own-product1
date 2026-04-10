@@ -28,12 +28,11 @@ export default function WaitlistForm() {
     setIsPending(true);
     try {
       // Call GAS directly from the browser with no-cors to avoid redirect/auth issues
-      await fetch("https://script.google.com/macros/s/AKfycbyaPA7AmuqAB0gQwdmnAVvL5ke7GG2jCYHawdxOeVOnUK6SUx57zbCZ4A5gmvVW6mzFjQ/exec", {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "text/plain" },
-        body: JSON.stringify({ hotelName, ownerName, phone }),
-      });
+      const url = new URL("https://script.google.com/macros/s/AKfycbyaPA7AmuqAB0gQwdmnAVvL5ke7GG2jCYHawdxOeVOnUK6SUx57zbCZ4A5gmvVW6mzFjQ/exec");
+      url.searchParams.set("hotelName", hotelName);
+      url.searchParams.set("ownerName", ownerName);
+      url.searchParams.set("phone", phone);
+      await fetch(url.toString(), { mode: "no-cors" });
       setStatus("success");
     } catch {
       setStatus("error");
