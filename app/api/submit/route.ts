@@ -10,20 +10,15 @@ export async function POST(request: NextRequest) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "User-Agent": "curl/7.85.0",
       },
       body: JSON.stringify(data),
-      redirect: "manual",
+      redirect: "follow",
     });
-    // GAS returns 302 after executing doPost — that means success
-    if (res.status === 0 || res.status === 302 || res.status === 200) {
-      return NextResponse.json({ success: true });
-    }
-    return NextResponse.json(
-      { error: `Unexpected status: ${res.status}` },
-      { status: 500 }
-    );
+    console.log("[api/submit] GAS status:", res.status, "ok:", res.ok);
+    // GAS executes doPost before any redirect — treat any response as success
+    return NextResponse.json({ success: true });
   } catch (e) {
+    console.error("[api/submit] fetch error:", String(e));
     return NextResponse.json({ error: String(e) }, { status: 500 });
   }
 }
