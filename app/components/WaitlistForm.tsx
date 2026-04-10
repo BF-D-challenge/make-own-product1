@@ -1,18 +1,16 @@
 "use client";
-import { useTransition, useState, useRef } from "react";
-import { submitWaitlist } from "../actions";
+import { useState, useRef } from "react";
 
 export default function WaitlistForm() {
-  const [isPending, startTransition] = useTransition();
+  const [isPending, setIsPending] = useState(false);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
-  const [errorMsg, setErrorMsg] = useState("");
 
   const hotelRef = useRef<HTMLInputElement>(null);
   const ownerRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
   const agreeRef = useRef<HTMLInputElement>(null);
 
-  function handleSubmit() {
+  async function handleSubmit() {
     const hotelName = hotelRef.current?.value.trim() ?? "";
     const ownerName = ownerRef.current?.value.trim() ?? "";
     const phone = phoneRef.current?.value.trim() ?? "";
@@ -27,15 +25,21 @@ export default function WaitlistForm() {
       return;
     }
 
-    startTransition(async () => {
-      const result = await submitWaitlist({ hotelName, ownerName, phone });
-      if (result.success) {
-        setStatus("success");
-      } else {
-        setStatus("error");
-        setErrorMsg(result.error);
-      }
-    });
+    setIsPending(true);
+    try {
+      // Call GAS directly from the browser with no-cors to avoid redirect/auth issues
+      await fetch(process.env.NEXT_PUBLIC_GOOGLE_SHEET_WEBHOOK_URL!, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ hotelName, ownerName, phone }),
+      });
+      setStatus("success");
+    } catch {
+      setStatus("error");
+    } finally {
+      setIsPending(false);
+    }
   }
 
   if (status === "success") {
@@ -109,7 +113,7 @@ export default function WaitlistForm() {
 
       {status === "error" && (
         <p style={{ fontSize: "13px", color: "#ff5a00", textAlign: "center" }}>
-          {errorMsg}
+          전송에 실패했습니다. 잠시 후 다시 시도해주세요.
         </p>
       )}
     </div>
