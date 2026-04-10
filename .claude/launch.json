@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "landing",
-      "runtimeExecutable": "python3",
-      "runtimeArgs": ["/Users/choiyunjeong/Downloads/landing/server.py"],
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "cd /Users/choiyunjeong/Downloads/landing && /usr/local/bin/npm run dev -- --port $PORT"],
       "port": 3000,
       "autoPort": true
     }
