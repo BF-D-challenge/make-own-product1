@@ -15,5 +15,5 @@ jobs:
 
       - name: Push to Org repo
         run: |
-          git remote add org https://x-access-token:${{ secrets.ORG_TOKEN }}@github.com/BF-D-challenge/[본인팀레포이름].git
-          git push org HEAD:refs/heads/members/[이름-프로젝트명] --force
+          git remote add org https://x-access-token:${{ secrets.ORG_TOKEN }}@github.com/BF-D-challenge/make-own-product1.git
+          git push org HEAD:refs/heads/members/annssu --force
