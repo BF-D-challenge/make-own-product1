@@ -10,7 +10,7 @@ export default function Home() {
         <div className="header-sticky">
           <div className="header-badge">
             <span>현재 매칭 품질을 위해</span>
-            <span>[서울 강남/서초 지역]</span>
+            <span>[서울]</span>
             <span>사장님 50분만 선착순 모집</span>
           </div>
           <h1>
