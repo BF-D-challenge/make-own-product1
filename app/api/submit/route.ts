@@ -4,7 +4,7 @@ const GAS_URL =
   "https://script.google.com/macros/s/AKfycbyaPA7AmuqAB0gQwdmnAVvL5ke7GG2jCYHawdxOeVOnUK6SUx57zbCZ4A5gmvVW6mzFjQ/exec";
 
 export async function POST(request: NextRequest) {
-  const data = await request.json();
+  const data: { hotelName: string; ownerName: string; email: string } = await request.json();
 
   try {
     await fetch(GAS_URL, {

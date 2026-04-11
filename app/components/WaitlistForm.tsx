@@ -1,6 +1,5 @@
 "use client";
 import { useState, useRef } from "react";
-import { submitWaitlist } from "../actions";
 
 export default function WaitlistForm() {
   const [isPending, setIsPending] = useState(false);
@@ -28,13 +27,15 @@ export default function WaitlistForm() {
 
     setIsPending(true);
     try {
-      const result = await submitWaitlist({ hotelName, ownerName, email });
-      
+      const res = await fetch("/api/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ hotelName, ownerName, email }),
+      });
+      const result = await res.json();
       if (result.success) {
         setStatus("success");
       } else {
-        // 🚨 여기에 진짜 구글 에러를 띄워주는 팝업창이 추가되었습니다!
-        alert("🚨 구글 에러 원인:\n" + result.error);
         setStatus("error");
       }
     } catch {
@@ -99,8 +100,8 @@ export default function WaitlistForm() {
       </button>
 
       {status === "error" && (
-        <p style={{ fontSize: "13px", color: "#ff5a00", textAlign: "center", marginTop: "12px" }}>
-          전송에 실패했습니다. 에러 팝업창을 확인해 주세요.
+        <p style={{ fontSize: "13px", color: "#ff5a00", textAlign: "center" }}>
+          전송에 실패했습니다. 잠시 후 다시 시도해주세요.
         </p>
       )}
     </div>
