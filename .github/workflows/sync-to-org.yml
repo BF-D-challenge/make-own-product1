@@ -1,5 +1,14 @@
 name: Sync to Org
 
+# ⚠️ 이 파일을 사용하기 전에 아래 항목을 반드시 수정하세요:
+#
+# 1. 19번째 줄의 브랜치명을 본인의 "이름-서비스명" 형식으로 변경하세요.
+#    예시: members/정민-bfd  →  members/홍길동-myapp
+#
+# 2. GitHub Secrets에 ORG_TOKEN을 등록하세요.
+#    Settings → Secrets and variables → Actions → New repository secret
+#    Name: ORG_TOKEN / Value: GitHub Personal Access Token (repo + workflow 권한 필요)
+
 on:
   push:
     branches: [main]
