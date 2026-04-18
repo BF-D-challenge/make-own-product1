@@ -26,7 +26,7 @@ function Header() {
         <img src="/logo.svg" alt="Joop" className="h-5 w-[52px] object-contain" />
         <a
           href="#notify"
-          className="flex w-[119px] items-center justify-center rounded-[12px] bg-[#ff5a00] px-5 py-3 text-[14px] font-semibold text-white transition-colors hover:bg-[#e05000]"
+          className="flex items-center justify-center whitespace-nowrap rounded-[12px] bg-[#ff5a00] px-5 py-3 text-[14px] font-semibold text-white transition-colors hover:bg-[#e05000]"
         >
           사전 알림 신청
         </a>
@@ -98,7 +98,7 @@ function HeroSection() {
                 <button
                   type="submit"
                   disabled={form.loading}
-                  className="flex h-[44px] w-[160px] shrink-0 items-center justify-center rounded-[12px] bg-[#ff5a00] px-6 text-[14px] font-semibold text-white transition-all hover:bg-[#e05000] active:scale-95 disabled:opacity-70"
+                  className="flex h-[44px] shrink-0 items-center justify-center whitespace-nowrap rounded-[12px] bg-[#ff5a00] px-6 text-[14px] font-semibold text-white transition-all hover:bg-[#e05000] active:scale-95 disabled:opacity-70"
                 >
                   {form.loading ? (
                     <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
