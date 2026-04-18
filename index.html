@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>줍(Jjup) — 비어있는 좋은 숙소, 가볍게 줍다</title>
+  <meta name="description" content="갑작스러운 취소, 평일의 빈 방. 퀄리티 높은 숙소를 수수료 거품 없이 가장 합리적인 가격으로 만나보세요." />
+  <meta property="og:title" content="줍(Jjup) — 비어있는 좋은 숙소, 가볍게 줍다" />
+  <meta property="og:description" content="갑작스러운 취소, 평일의 빈 방. 퀄리티 높은 숙소를 수수료 거품 없이 가장 합리적인 가격으로 만나보세요." />
+  <meta property="og:type" content="website" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
+          },
+          keyframes: {
+            fadeUp: {
+              '0%':   { opacity: '0', transform: 'translateY(24px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            fadeIn: {
+              '0%':   { opacity: '0' },
+              '100%': { opacity: '1' },
+            },
+            bounce: {
+              '0%, 100%': { transform: 'translateY(-10%)', animationTimingFunction: 'cubic-bezier(0.8,0,1,1)' },
+              '50%':       { transform: 'translateY(0)',    animationTimingFunction: 'cubic-bezier(0,0,0.2,1)' },
+            },
+          },
+          animation: {
+            'fade-up': 'fadeUp 0.6s ease-out forwards',
+            'fade-in': 'fadeIn 0.8s ease-out forwards',
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Pretendard Font -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+
+  <style>
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+
+    /* Entrance animations */
+    .anim-fade-in  { opacity: 0; animation: fadeIn  0.8s ease-out forwards; }
+    .anim-fade-up  { opacity: 0; animation: fadeUp  0.6s ease-out forwards; }
+    .delay-150 { animation-delay: 150ms; }
+    .delay-250 { animation-delay: 250ms; }
+    .delay-350 { animation-delay: 350ms; }
+    .delay-450 { animation-delay: 450ms; }
+
+    @keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeUp  { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes spin    { to { transform: rotate(360deg); } }
+    @keyframes bounce  {
+      0%, 100% { transform: translateX(-50%) translateY(-10%); animation-timing-function: cubic-bezier(0.8,0,1,1); }
+      50%       { transform: translateX(-50%) translateY(0);    animation-timing-function: cubic-bezier(0,0,0.2,1); }
+    }
+
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; }
+
+    /* Card hover */
+    .solution-card { transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s, border-color 0.3s; }
+    .solution-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); background-color: #eff6ff; border-color: #bfdbfe; }
+    .solution-card:hover .card-icon-wrap { background-color: #2563eb; }
+    .solution-card:hover .card-icon-wrap svg { color: white; }
+    .card-icon-wrap { transition: background-color 0.3s; }
+    .card-icon-wrap svg { transition: color 0.3s; }
+
+    /* Scroll indicator bounce */
+    .scroll-indicator { animation: bounce 1s infinite; position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%); }
+
+    /* Dot pattern for Vision section */
+    .dot-pattern {
+      background-image: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.15) 1px, transparent 1px),
+                        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.15) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- ── HEADER ─────────────────────────────────────────────────── -->
+  <header class="fixed top-0 z-50 w-full border-b border-slate-100 bg-white/80 backdrop-blur-md">
+    <div class="mx-auto flex h-14 max-w-5xl items-center justify-between px-5">
+      <span class="text-xl font-bold tracking-tight text-slate-900">
+        줍<span class="text-blue-600">.</span>
+      </span>
+      <a href="#notify" class="rounded-full bg-blue-600 px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700">
+        사전 알림 신청
+      </a>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ── HERO ───────────────────────────────────────────────────── -->
+    <section class="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 px-5 pt-14">
+      <!-- Blobs -->
+      <div aria-hidden class="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-blue-200/30 blur-3xl"></div>
+      <div aria-hidden class="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-indigo-200/30 blur-3xl"></div>
+
+      <div class="relative z-10 mx-auto max-w-2xl text-center">
+        <!-- Label -->
+        <div class="mb-8 anim-fade-in">
+          <span class="inline-block rounded-full border border-blue-200 bg-blue-50 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-blue-600">
+            🏨 GUEST EARLY ACCESS
+          </span>
+        </div>
+
+        <!-- Headline -->
+        <h1 class="anim-fade-up delay-150 mb-6 text-4xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-5xl md:text-6xl">
+          비어있는 좋은 숙소,<br />
+          <span style="background: linear-gradient(to right, #2563eb, #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+            가볍게 줍다.
+          </span>
+        </h1>
+
+        <!-- Sub-copy -->
+        <p class="anim-fade-up delay-250 mb-12 text-base leading-relaxed text-slate-500 sm:text-lg">
+          갑작스러운 취소, 평일의 빈 방.<br class="hidden sm:block" />
+          퀄리티 높은 숙소를 수수료 거품 없이 가장 합리적인 가격으로 만나보세요.
+        </p>
+
+        <!-- CTA Form -->
+        <div class="anim-fade-up delay-350" id="hero-form-wrap">
+          <form id="hero-form" class="flex flex-col gap-3 sm:flex-row" onsubmit="submitHeroForm(event)">
+            <input
+              type="email"
+              required
+              placeholder="이메일 주소를 입력해 주세요"
+              id="hero-email"
+              class="flex-1 rounded-xl border border-slate-200 bg-white px-5 py-4 text-sm text-slate-800 shadow-sm outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+            />
+            <button
+              type="submit"
+              id="hero-btn"
+              class="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-4 text-sm font-semibold text-white shadow-md transition-all hover:bg-blue-700 hover:shadow-lg active:scale-95"
+            >
+              첫 줍기 혜택 알림 받기
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </button>
+          </form>
+          <p class="mt-3 text-xs text-slate-400">스팸 메일은 보내지 않습니다. 언제든지 수신 거부 가능합니다.</p>
+        </div>
+
+        <!-- Hero success -->
+        <div id="hero-success" class="hidden flex-col items-center gap-3 rounded-2xl bg-white/80 px-8 py-8 shadow-lg ring-1 ring-slate-200 backdrop-blur-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <p class="text-lg font-semibold text-slate-800">신청이 완료되었습니다!</p>
+          <p class="text-sm text-slate-500">정식 오픈 소식과 특별 혜택을 가장 먼저 알려드릴게요.</p>
+        </div>
+
+        <!-- Social proof -->
+        <p class="anim-fade-up delay-450 mt-10 text-xs text-slate-400">
+          이미 <span class="font-semibold text-slate-600">1,200명 이상</span>이 사전 신청을 완료했습니다.
+        </p>
+      </div>
+
+      <!-- Scroll indicator -->
+      <div class="scroll-indicator">
+        <div class="h-10 w-6 rounded-full border-2 border-slate-300 p-1">
+          <div class="mx-auto h-2 w-1 rounded-full bg-slate-400"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PROBLEM ─────────────────────────────────────────────────── -->
+    <section class="bg-slate-900 px-5 py-24 md:py-32">
+      <div class="mx-auto max-w-3xl text-center">
+        <span class="inline-block rounded-full border border-blue-700 bg-blue-900/50 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-blue-400">
+          PROBLEM
+        </span>
+        <h2 class="mx-auto mt-6 max-w-xl text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl md:text-5xl">
+          좋은 숙소는 왜 <span class="text-blue-400">항상 비싸야만</span> 할까요?
+        </h2>
+        <div class="mx-auto mt-10 max-w-2xl rounded-2xl border border-slate-700 bg-slate-800/60 p-8 text-left backdrop-blur-sm md:p-10">
+          <p class="text-base leading-8 text-slate-300 sm:text-lg">
+            마음에 드는 숙소는 너무 비싸고, 저렴한 곳은 아쉽습니다. 하지만 아무리 인기 있는 숙소라도
+            <span class="font-semibold text-white">피치 못할 예약 취소나 비수기에는 빈 방(공실)</span>이 생기기 마련입니다.
+          </p>
+          <p class="mt-5 text-base leading-8 text-slate-400 sm:text-lg">
+            이 아까운 빈 공간들을 게스트가 부담 없이 누릴 방법은 없을까요?
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SOLUTION ────────────────────────────────────────────────── -->
+    <section class="bg-white px-5 py-24 md:py-32">
+      <div class="mx-auto max-w-5xl">
+        <div class="mb-16 text-center">
+          <span class="inline-block rounded-full border border-blue-200 bg-blue-50 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-blue-600">
+            SOLUTION
+          </span>
+          <h2 class="mx-auto mt-6 max-w-2xl text-3xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-4xl">
+            호스트의 아까운 빈 방이,<br />
+            <span class="text-blue-600">게스트에겐 기회가 됩니다.</span>
+          </h2>
+        </div>
+
+        <div class="grid gap-6 md:grid-cols-3">
+
+          <!-- Card 1 -->
+          <div class="solution-card group rounded-2xl border border-slate-100 bg-slate-50 p-8">
+            <div class="card-icon-wrap mb-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-slate-100">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+            </div>
+            <h3 class="mb-3 text-lg font-bold text-slate-900">가벼운 가격으로 줍다</h3>
+            <p class="text-sm leading-7 text-slate-500">기존 예약 플랫폼들이 가져가던 과도한 수수료를 걷어냈습니다. 플랫폼이 가벼워진 만큼, 게스트는 더 정직하고 낮은 가격으로 숙소를 예약할 수 있습니다.</p>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="solution-card group rounded-2xl border border-slate-100 bg-slate-50 p-8">
+            <div class="card-icon-wrap mb-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-slate-100">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <h3 class="mb-3 text-lg font-bold text-slate-900">숨어있는 퀄리티를 줍다</h3>
+            <p class="text-sm leading-7 text-slate-500">무수히 많은 리스트 속에서 피곤하게 비교할 필요 없습니다. 엄선된 기준을 통과한 퀄리티 높은 숙소의 빈 방만을 선별하여 제안합니다.</p>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="solution-card group rounded-2xl border border-slate-100 bg-slate-50 p-8">
+            <div class="card-icon-wrap mb-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-slate-100">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </div>
+            <h3 class="mb-3 text-lg font-bold text-slate-900">즉흥적인 설렘을 줍다</h3>
+            <p class="text-sm leading-7 text-slate-500">완벽한 여행 계획이 없어도 괜찮습니다. 훌쩍 떠나고 싶은 날, 매력적인 가격으로 오픈된 숙소를 우연히 발견하고 줍는 기쁨을 누려보세요.</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── VISION ──────────────────────────────────────────────────── -->
+    <section class="relative overflow-hidden px-5 py-28 md:py-40" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #4338ca 100%);">
+      <!-- Dot pattern -->
+      <div aria-hidden class="dot-pattern pointer-events-none absolute inset-0"></div>
+      <!-- Decorative blobs -->
+      <div aria-hidden class="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
+      <div aria-hidden class="pointer-events-none absolute -bottom-20 -left-20 h-64 w-64 rounded-full" style="background: rgba(129,140,248,0.2); filter: blur(48px);"></div>
+
+      <div class="relative z-10 mx-auto max-w-3xl text-center">
+        <div class="mb-6 flex justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#bfdbfe" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+        </div>
+        <h2 class="mb-8 text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl md:text-5xl">
+          일상을 여행으로 만드는<br />가장 가벼운 방법
+        </h2>
+        <p class="mx-auto max-w-xl text-base leading-8 sm:text-lg" style="color: #bfdbfe;">
+          특별한 기념일이나 완벽한 준비가 없어도 좋습니다. 지친 일상 속에서 좋은 공간을 가볍게 줍고 떠나는 것만으로도, 당신의 내일은 훨씬 더 산뜻해질 것입니다.
+        </p>
+
+        <!-- Stats -->
+        <div class="mx-auto mt-16 grid max-w-lg grid-cols-3 gap-4">
+          <div class="rounded-2xl px-4 py-5" style="background: rgba(255,255,255,0.1); backdrop-filter: blur(8px);">
+            <p class="text-2xl font-extrabold text-white">0원</p>
+            <p class="mt-1 text-xs" style="color: #bfdbfe;">숨겨진 수수료</p>
+          </div>
+          <div class="rounded-2xl px-4 py-5" style="background: rgba(255,255,255,0.1); backdrop-filter: blur(8px);">
+            <p class="text-2xl font-extrabold text-white">엄선</p>
+            <p class="mt-1 text-xs" style="color: #bfdbfe;">퀄리티 숙소</p>
+          </div>
+          <div class="rounded-2xl px-4 py-5" style="background: rgba(255,255,255,0.1); backdrop-filter: blur(8px);">
+            <p class="text-2xl font-extrabold text-white">즉시</p>
+            <p class="mt-1 text-xs" style="color: #bfdbfe;">예약 가능</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── BOTTOM CTA ──────────────────────────────────────────────── -->
+    <section id="notify" class="bg-slate-50 px-5 py-24 md:py-32">
+      <div class="mx-auto max-w-2xl">
+        <div class="overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-slate-100">
+          <!-- Accent bar -->
+          <div class="h-1.5 w-full" style="background: linear-gradient(to right, #3b82f6, #6366f1);"></div>
+
+          <div class="px-8 py-12 md:px-14">
+            <div class="mb-2 text-center">
+              <span class="inline-block rounded-full border border-blue-200 bg-blue-50 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-blue-600">
+                EARLY ACCESS
+              </span>
+            </div>
+            <h2 class="mt-5 text-center text-2xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-3xl md:text-4xl">
+              가장 먼저 좋은 숙소를 주울 준비,<br />
+              <span class="text-blue-600">되셨나요?</span>
+            </h2>
+            <p class="mx-auto mt-5 max-w-md text-center text-sm leading-7 text-slate-500 sm:text-base">
+              지금 사전 알림을 신청하시면, 정식 오픈 소식과 함께 첫 여행을 더욱 가볍게 만들어줄
+              <span class="font-semibold text-slate-700">특별한 쿠폰</span>을 챙겨드립니다.
+            </p>
+
+            <div class="mt-10">
+              <!-- Success state (hidden initially) -->
+              <div id="bottom-success" class="hidden flex-col items-center gap-4 rounded-2xl bg-blue-50 px-8 py-10">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <div class="text-center">
+                  <p id="bottom-success-name" class="text-lg font-bold text-slate-800"></p>
+                  <p class="mt-2 text-sm text-slate-500">정식 오픈 시 특별 쿠폰과 함께 연락드릴게요.</p>
+                </div>
+              </div>
+
+              <!-- Form -->
+              <form id="bottom-form" onsubmit="submitBottomForm(event)" class="flex flex-col gap-4">
+                <div class="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label for="bottom-name" class="mb-1.5 block text-xs font-semibold text-slate-600">성함</label>
+                    <input id="bottom-name" type="text" required placeholder="홍길동"
+                      class="w-full rounded-xl border border-slate-200 px-4 py-3.5 text-sm text-slate-800 outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100" />
+                  </div>
+                  <div>
+                    <label for="bottom-email" class="mb-1.5 block text-xs font-semibold text-slate-600">이메일</label>
+                    <input id="bottom-email" type="email" required placeholder="hello@example.com"
+                      class="w-full rounded-xl border border-slate-200 px-4 py-3.5 text-sm text-slate-800 outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100" />
+                  </div>
+                </div>
+                <button type="submit" id="bottom-btn"
+                  class="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-4 text-sm font-bold text-white shadow-md transition-all hover:bg-blue-700 hover:shadow-lg active:scale-95">
+                  사전 알림 및 쿠폰 신청하기
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                </button>
+                <p class="text-center text-xs text-slate-400">개인정보는 오픈 안내 목적으로만 활용되며, 이후 즉시 파기됩니다.</p>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── FOOTER ─────────────────────────────────────────────────── -->
+  <footer class="border-t border-slate-100 bg-white px-5 py-10">
+    <div class="mx-auto max-w-5xl flex flex-col items-center gap-3 text-center sm:flex-row sm:justify-between sm:text-left">
+      <span class="text-xl font-bold tracking-tight text-slate-900">
+        줍<span class="text-blue-600">.</span>
+      </span>
+      <p class="text-xs text-slate-400">© 2025 Jjup. 비어있는 좋은 숙소, 가볍게 줍다.</p>
+      <div class="flex gap-5 text-xs text-slate-400">
+        <a href="#" class="hover:text-slate-600">이용약관</a>
+        <a href="#" class="hover:text-slate-600">개인정보처리방침</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* ── Hero Form ────────────────────────────────────────────── */
+    function submitHeroForm(e) {
+      e.preventDefault();
+      const email = document.getElementById('hero-email').value;
+      const btn   = document.getElementById('hero-btn');
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>';
+
+      setTimeout(() => {
+        console.log('[Hero] 이메일 신청:', email);
+        document.getElementById('hero-form').classList.add('hidden');
+        document.querySelector('#hero-form-wrap > p').classList.add('hidden');
+
+        const success = document.getElementById('hero-success');
+        success.classList.remove('hidden');
+        success.classList.add('flex');
+      }, 800);
+    }
+
+    /* ── Bottom CTA Form ──────────────────────────────────────── */
+    function submitBottomForm(e) {
+      e.preventDefault();
+      const name  = document.getElementById('bottom-name').value;
+      const email = document.getElementById('bottom-email').value;
+      const btn   = document.getElementById('bottom-btn');
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>';
+
+      setTimeout(() => {
+        console.log('[Bottom CTA] 사전 알림 신청:', { name, email });
+
+        document.getElementById('bottom-form').classList.add('hidden');
+
+        const success = document.getElementById('bottom-success');
+        success.classList.remove('hidden');
+        success.classList.add('flex');
+        document.getElementById('bottom-success-name').textContent =
+          name + '님, 신청이 완료되었습니다!';
+      }, 800);
+    }
+  </script>
+
+</body>
+</html>
