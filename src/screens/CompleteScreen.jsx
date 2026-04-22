@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import useAppStore from '../store/useAppStore'
 import StepIndicator from '../components/StepIndicator'
@@ -9,7 +9,12 @@ export default function CompleteScreen() {
   const navigate = useNavigate()
   const { day } = useParams()
   const dayNum = parseInt(day)
-  const { completeDay, resetProgress, nickname } = useAppStore()
+  const { completeDay, resetProgress, nickname, dayProgress } = useAppStore()
+
+  // completeDay 호출 전 기존에 완료된 날이 있었는지 체크
+  const hasCompleted = useRef(
+    Object.values(dayProgress).some(v => v === 'complete')
+  ).current
 
   useEffect(() => {
     completeDay(dayNum)
@@ -85,37 +90,39 @@ export default function CompleteScreen() {
         </div>
       </div>
 
-      {/* 하단 My 버튼 */}
+      {/* 하단 My 버튼 — 최초 진입(완료한 날 없음)엔 숨김 */}
       <div style={{
         padding: '16px 24px 36px',
         display: 'flex',
         justifyContent: 'flex-end',
         alignItems: 'center',
       }}>
-        <div
-          onClick={goToMy}
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '4px',
-            background: '#fff',
-            borderRadius: '999px',
-            width: '72px',
-            height: '72px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            cursor: 'pointer',
-          }}
-        >
-          <img src={myIcon} alt="My" style={{ width: '26px', height: '26px', objectFit: 'contain' }} />
-          <span style={{
-            fontFamily: 'Pretendard, sans-serif',
-            fontSize: '11px',
-            fontWeight: '600',
-            color: '#555',
-          }}>My</span>
-        </div>
+        {hasCompleted && (
+          <div
+            onClick={goToMy}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '4px',
+              background: '#fff',
+              borderRadius: '999px',
+              width: '72px',
+              height: '72px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              cursor: 'pointer',
+            }}
+          >
+            <img src={myIcon} alt="My" style={{ width: '26px', height: '26px', objectFit: 'contain' }} />
+            <span style={{
+              fontFamily: 'Pretendard, sans-serif',
+              fontSize: '11px',
+              fontWeight: '600',
+              color: '#555',
+            }}>My</span>
+          </div>
+        )}
       </div>
     </div>
   )
