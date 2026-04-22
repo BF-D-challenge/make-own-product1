@@ -31,18 +31,17 @@
   --font-body: 'Pretendard', sans-serif;
 }
 
-html, body {
-  height: 100%;
+html {
+  min-height: 100%;
   background-image: url('./assets/bg_texture.png');
   background-size: cover;
-  background-attachment: fixed;
-  background-position: center;
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-color: #f0f0f0;
 }
 
-/* iOS Safe Area 대응 */
 body {
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
+  min-height: 100%;
 }
 
 body {
