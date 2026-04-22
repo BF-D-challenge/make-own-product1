@@ -25,7 +25,8 @@ function parseExample(example) {
 
 export default function StudyScreen() {
   const navigate = useNavigate()
-  const { nickname } = useAppStore()
+  const { nickname, dayProgress } = useAppStore()
+  const hasCompleted = Object.values(dayProgress).some(v => v === 'complete')
   const { day, wordIndex } = useParams()
   const dayNum = parseInt(day)
   const wordIdx = parseInt(wordIndex)
@@ -161,24 +162,26 @@ export default function StudyScreen() {
         </div>
       </div>
 
-      {/* 하단 My 버튼 */}
+      {/* 하단 My 버튼 — 최초 진입(완료한 날 없음)엔 숨김 */}
       <div style={{ padding: '16px 24px 36px', display: 'flex', justifyContent: 'flex-end' }}>
-        <button onClick={goToMy} style={{
-          background: 'none', border: 'none', cursor: 'pointer',
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px',
-        }}>
-          <div style={{
-            width: '44px', height: '44px', borderRadius: '50%',
-            background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+        {hasCompleted && (
+          <button onClick={goToMy} style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px',
           }}>
-            <img src={myIcon} alt="My" style={{ width: '24px', height: '24px', objectFit: 'contain' }} />
-          </div>
-          <span style={{
-            fontFamily: 'Pretendard, sans-serif', fontSize: '11px',
-            fontWeight: '600', color: '#888',
-          }}>My</span>
-        </button>
+            <div style={{
+              width: '44px', height: '44px', borderRadius: '50%',
+              background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+            }}>
+              <img src={myIcon} alt="My" style={{ width: '24px', height: '24px', objectFit: 'contain' }} />
+            </div>
+            <span style={{
+              fontFamily: 'Pretendard, sans-serif', fontSize: '11px',
+              fontWeight: '600', color: '#888',
+            }}>My</span>
+          </button>
+        )}
       </div>
     </div>
   )
