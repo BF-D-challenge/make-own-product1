@@ -1,0 +1,160 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+
+@font-face {
+  font-family: 'BM kkubulim';
+  src: url('./assets/BMKkubulimTTF.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+  --color-text: #444444;
+  --color-text-sub: #666666;
+  --color-bg: #FFFFFF;
+  --color-bg-texture: #F8F8F8;
+  --color-btn-default: #F5F5F5;
+  --color-btn-correct: #F4FFCC;
+  --color-btn-wrong: #FCDAD3;
+  --color-step-active: #444444;
+  --color-step-inactive: #DDDDDD;
+  --color-step-complete: #4CAF50;
+  --color-accent: #CCFF00;
+  --color-border: #EEEEEE;
+  --font-title: 'BM kkubulim', sans-serif;
+  --font-body: 'Pretendard', sans-serif;
+}
+
+html, body {
+  height: 100%;
+  background-image: url('./assets/bg_texture.png');
+  background-size: 100% 100%;
+  background-attachment: fixed;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  height: 100%;
+}
+
+/* 모바일 컨테이너 */
+.app-container {
+  max-width: 375px;
+  min-height: 100svh;
+  margin: 0 auto;
+  background: transparent;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 공통 화면 레이아웃 */
+.screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  background-color: #fff;
+  background-image: url('./assets/bg_texture.png');
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+}
+
+/* 상단 타이틀 영역 */
+.container-title {
+  padding: 56px 24px 20px;
+}
+
+.container-title .subtitle {
+  font-family: var(--font-title);
+  font-size: 14px;
+  color: var(--color-text-sub);
+  margin-bottom: 4px;
+}
+
+.container-title .title {
+  font-family: var(--font-title);
+  font-size: 24px;
+  color: var(--color-text);
+  line-height: 1.35;
+  white-space: pre-line;
+}
+
+/* 콘텐츠 영역 */
+.container-content {
+  flex: 1;
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 카드 */
+.card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px 24px;
+  flex: 1;
+}
+
+/* 플로팅 버튼 영역 */
+.floating-btn-area {
+  padding: 16px 24px 36px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.btn-next {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 0;
+}
+
+.btn-next:active {
+  opacity: 0.6;
+}
+
+/* 마이 버튼 (우측 하단) */
+.my-btn-area {
+  padding: 16px 24px 36px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.my-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.my-btn span {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-sub);
+}

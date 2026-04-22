@@ -1,0 +1,185 @@
+import { useNavigate, useParams } from 'react-router-dom'
+import { DAYS } from '../data/words'
+import useAppStore from '../store/useAppStore'
+import StepIndicator from '../components/StepIndicator'
+import eastIcon from '../assets/east_icon.svg'
+import lineStroke from '../assets/line_stroke.svg'
+import myIcon from '../assets/my_icon.svg'
+
+// 예문에서 {word} → 노란 하이라이트 파싱
+function parseExample(example) {
+  const parts = example.split(/\{([^}]+)\}/g)
+  return parts.map((part, i) =>
+    i % 2 === 1 ? (
+      <mark key={i} style={{
+        background: '#CCFF00',
+        borderRadius: '2px',
+        padding: '0 2px',
+        fontStyle: 'normal',
+      }}>
+        {part}
+      </mark>
+    ) : part
+  )
+}
+
+export default function StudyScreen() {
+  const navigate = useNavigate()
+  const { nickname } = useAppStore()
+  const { day, wordIndex } = useParams()
+  const dayNum = parseInt(day)
+  const wordIdx = parseInt(wordIndex)
+
+  const dayData = DAYS.find((d) => d.day === dayNum)
+  if (!dayData) return null
+  const word = dayData.words[wordIdx]
+  if (!word) return null
+
+  const handleNext = () => {
+    const nextIdx = wordIdx + 1
+    if (nextIdx >= 10) navigate(`/complete/${day}`)
+    else navigate(`/quiz/${day}/${nextIdx}`)
+  }
+  const goToMy = () => navigate('/my')
+
+  return (
+    <div className="screen">
+      {/* 상단 타이틀 — 두 줄 동일 폰트/크기 */}
+      <div style={{ padding: '52px 24px 16px' }}>
+        <p style={{
+          fontFamily: 'BM kkubulim, sans-serif',
+          fontSize: '22px',
+          color: '#444',
+          lineHeight: 1.5,
+        }}>
+          공부싫어 다 귀찮아 {nickname}님,
+        </p>
+        <p style={{
+          fontFamily: 'BM kkubulim, sans-serif',
+          fontSize: '22px',
+          color: '#444',
+          lineHeight: 1.5,
+        }}>
+          오늘의 10단어 준비 되셨나요?
+        </p>
+      </div>
+
+      {/* 콘텐츠 */}
+      <div style={{ flex: 1, padding: '0 24px', display: 'flex', flexDirection: 'column' }}>
+        {/* 스텝 인디케이터 */}
+        <StepIndicator total={10} current={wordIdx} />
+
+        {/* 단어 카드 */}
+        <div style={{
+          flex: 1,
+          background: '#fff',
+          borderRadius: '16px',
+          padding: '28px 24px 20px',
+          display: 'flex',
+          flexDirection: 'column',
+        }}>
+          {/* 영단어 */}
+          <h2 style={{
+            fontFamily: 'Pretendard, sans-serif',
+            fontSize: '30px',
+            fontWeight: '700',
+            color: '#444',
+            marginBottom: '8px',
+            lineHeight: 1.2,
+          }}>
+            {word.english}
+          </h2>
+
+          {/* 한국어 뜻 */}
+          <p style={{
+            fontFamily: 'Pretendard, sans-serif',
+            fontSize: '20px',
+            fontWeight: '500',
+            color: '#444',
+            lineHeight: 1.4,
+            marginBottom: '16px',
+          }}>
+            {word.korean}
+          </p>
+
+          {/* 예문 — blockquote 스타일 */}
+          <div style={{
+            display: 'flex',
+            flexDirection: 'row',
+            gap: '10px',
+            alignItems: 'flex-start',
+          }}>
+            <img src={lineStroke} alt="" style={{ width: '4px', flexShrink: 0, alignSelf: 'stretch', objectFit: 'fill', height: '100%' }} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <p style={{
+              fontFamily: 'Pretendard, sans-serif',
+              fontSize: '14px',
+              fontWeight: '400',
+              color: '#555',
+              lineHeight: 1.7,
+            }}>
+              {parseExample(word.example)}
+            </p>
+            {word.exampleKorean && (
+              <p style={{
+                fontFamily: 'Pretendard, sans-serif',
+                fontSize: '13px',
+                fontWeight: '400',
+                color: '#888',
+                lineHeight: 1.6,
+              }}>
+                {word.exampleKorean}
+              </p>
+            )}
+            </div>
+          </div>
+
+          {/* 스페이서 */}
+          <div style={{ flex: 1 }} />
+
+          {/* 다음 버튼 — 카드 내부 우측 하단 */}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
+            <button
+              onClick={handleNext}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                fontFamily: 'Pretendard, sans-serif',
+                fontSize: '15px',
+                fontWeight: '600',
+                color: '#444',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: '4px 0',
+              }}
+            >
+              다음 <img src={eastIcon} alt="→" style={{ width: '18px', height: '18px', objectFit: 'contain', verticalAlign: 'middle' }} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* 하단 My 버튼 */}
+      <div style={{ padding: '16px 24px 36px', display: 'flex', justifyContent: 'flex-end' }}>
+        <button onClick={goToMy} style={{
+          background: 'none', border: 'none', cursor: 'pointer',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px',
+        }}>
+          <div style={{
+            width: '44px', height: '44px', borderRadius: '50%',
+            background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+          }}>
+            <img src={myIcon} alt="My" style={{ width: '24px', height: '24px', objectFit: 'contain' }} />
+          </div>
+          <span style={{
+            fontFamily: 'Pretendard, sans-serif', fontSize: '11px',
+            fontWeight: '600', color: '#888',
+          }}>My</span>
+        </button>
+      </div>
+    </div>
+  )
+}
