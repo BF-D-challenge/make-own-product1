@@ -31,7 +31,7 @@ export default function CompleteScreen() {
           {nickname}님,
         </p>
         <p style={{ fontFamily: 'BM kkubulim, sans-serif', fontSize: '24px', color: '#444', lineHeight: 1.5 }}>
-          오늘의 10단어 준비 되셨나요?
+          오늘도 해내셨네요, 축하해요!
         </p>
       </div>
 
