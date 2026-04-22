@@ -70,7 +70,7 @@ export default function MyScreen() {
           lineHeight: 1.4,
           margin: 0,
         }}>
-          공부싫어 다 귀찮아 {nickname}님!
+          {nickname}님!
         </h1>
       </div>
 

@@ -84,7 +84,7 @@ export default function QuizScreen() {
       {/* 상단 타이틀 — BM kkubulim, 두 줄 동일 크기 */}
       <div style={{ padding: '52px 24px 16px' }}>
         <p style={{ fontFamily: 'BM kkubulim, sans-serif', fontSize: '24px', color: '#444', lineHeight: 1.5 }}>
-          공부싫어 다 귀찮아 {nickname}님,
+          {nickname}님,
         </p>
         <p style={{ fontFamily: 'BM kkubulim, sans-serif', fontSize: '24px', color: '#444', lineHeight: 1.5 }}>
           오늘의 10단어 준비 되셨나요?

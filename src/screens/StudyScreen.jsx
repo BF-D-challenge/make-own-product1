@@ -52,7 +52,7 @@ export default function StudyScreen() {
           color: '#444',
           lineHeight: 1.5,
         }}>
-          공부싫어 다 귀찮아 {nickname}님,
+          {nickname}님,
         </p>
         <p style={{
           fontFamily: 'BM kkubulim, sans-serif',
