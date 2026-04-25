@@ -23,7 +23,8 @@ export default function QuizScreen() {
   const dayNum = parseInt(day)
   const wordIdx = parseInt(wordIndex)
 
-  const { dayProgress, nickname, addWrongWord, resetSessionWrong } = useAppStore()
+  const { dayProgress, nickname, addWrongWord, resetSessionWrong, sessionWrongWords } = useAppStore()
+  const wrongDoneIndices = sessionWrongWords.map(w => w.index)
   const hasCompleted = Object.values(dayProgress).some(v => v === 'complete')
 
   const dayData = DAYS.find((d) => d.day === dayNum)
@@ -95,7 +96,7 @@ export default function QuizScreen() {
 
       {/* 콘텐츠 */}
       <div style={{ flex: 1, padding: '0 24px', display: 'flex', flexDirection: 'column' }}>
-        <StepIndicator total={10} current={wordIdx} wrongCurrent={quizResult === 'wrong'} />
+        <StepIndicator total={10} current={wordIdx} wrongCurrent={quizResult === 'wrong'} wrongDoneIndices={wrongDoneIndices} />
 
         {/* 퀴즈 카드 */}
         <div style={{
