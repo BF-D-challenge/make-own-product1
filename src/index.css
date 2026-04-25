@@ -47,6 +47,12 @@ html::before {
   background-position: center top;
 }
 
+/* 노치/홈바 Safe Area 대응 — 콘텐츠가 가려지지 않도록 */
+#root {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
 body {
   font-family: var(--font-body);
   color: var(--color-text);
