@@ -40,22 +40,31 @@ function nextDay7AM() {
   return d.getTime()
 }
 
-// localStorage 초기 상태 로드
+// localStorage 초기 상태 로드 (sessionStorage 폴백 포함)
 function loadState() {
   try {
     const saved = localStorage.getItem('engseven_state')
+    if (saved) return JSON.parse(saved)
+  } catch (e) {}
+  try {
+    const saved = sessionStorage.getItem('engseven_state')
     if (saved) return JSON.parse(saved)
   } catch (e) {}
   return null
 }
 
 function saveState(state) {
+  const data = JSON.stringify({
+    nickname: state.nickname,
+    dayProgress: state.dayProgress,
+    unlockTimes: state.unlockTimes,
+  })
   try {
-    localStorage.setItem('engseven_state', JSON.stringify({
-      nickname: state.nickname,
-      dayProgress: state.dayProgress,
-      unlockTimes: state.unlockTimes,
-    }))
+    localStorage.setItem('engseven_state', data)
+  } catch (e) {}
+  try {
+    // 카카오톡 등 인앱 브라우저에서 localStorage 차단 시 폴백
+    sessionStorage.setItem('engseven_state', data)
   } catch (e) {}
 }
 
