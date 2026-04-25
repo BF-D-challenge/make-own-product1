@@ -5,6 +5,8 @@
   src: url('./assets/BMKkubulimTTF.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
+  font-display: block; /* 로딩 전 보이지 않게 → 크기 변동 없음 */
+  size-adjust: 100%;
 }
 
 * {

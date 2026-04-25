@@ -29,8 +29,8 @@ export default function StepIndicator({ total = 10, current = 0, allComplete = f
             ? '#4CAF50'
             : (isComplete || isActive) ? '#444444'
             : '#DDDDDD'
-          size = isActive ? '24px' : '20px'
-          fontSize = isActive ? '12px' : '10px'
+          size = '24px'
+          fontSize = '12px'
         }
 
         return (

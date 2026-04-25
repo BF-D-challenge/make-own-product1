@@ -47,12 +47,11 @@ export default function QuizOption({ label, status = 'default', onClick }) {
       }}>
         {label}
       </span>
-      {isCorrect && (
-        <img src={iconCheck} alt="정답" style={{ width: '24px', height: '24px', flexShrink: 0 }} />
-      )}
-      {isWrong && (
-        <img src={iconClose} alt="오답" style={{ width: '24px', height: '24px', flexShrink: 0 }} />
-      )}
+      {/* 아이콘 자리 항상 예약 — 크기 변동 방지 */}
+      <div style={{ width: '24px', height: '24px', flexShrink: 0 }}>
+        {isCorrect && <img src={iconCheck} alt="정답" style={{ width: '24px', height: '24px' }} />}
+        {isWrong   && <img src={iconClose} alt="오답" style={{ width: '24px', height: '24px' }} />}
+      </div>
     </button>
   )
 }
