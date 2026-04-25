@@ -69,6 +69,7 @@ export default function CompleteScreen() {
         <div
           style={{
             flex: 1,
+            maxHeight: '440px',
             background: '#fff',
             borderRadius: '16px',
             padding: '20px 20px 16px',
