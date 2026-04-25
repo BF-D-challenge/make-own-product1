@@ -33,12 +33,6 @@
 
 html {
   height: 100%;
-  /* 노치/홈바 영역까지 텍스처로 채움 */
-  background-image: url('./assets/bg_texture.png');
-  background-size: cover;
-  background-position: center top;
-  background-repeat: no-repeat;
-  background-attachment: scroll;
 }
 
 body {
@@ -79,10 +73,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100svh;
-  background-image: url('./assets/bg_texture.png');
-  background-size: cover;
-  background-position: center top;
-  background-repeat: no-repeat;
+  background: transparent;
 }
 
 /* 상단 타이틀 영역 */
