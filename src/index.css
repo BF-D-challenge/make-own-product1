@@ -31,17 +31,20 @@
   --font-body: 'Pretendard', sans-serif;
 }
 
-html {
-  min-height: 100%;
+html, body {
+  height: 100%;
+  background: #f0f0f0;
+}
+
+/* iOS Safari 포함 전체 뷰포트 배경 고정 */
+html::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
   background-image: url('./assets/bg_texture.png');
   background-size: cover;
   background-position: center top;
-  background-repeat: no-repeat;
-  background-color: #f0f0f0;
-}
-
-body {
-  min-height: 100%;
 }
 
 body {
