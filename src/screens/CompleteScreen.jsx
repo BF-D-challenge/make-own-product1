@@ -128,7 +128,7 @@ export default function CompleteScreen() {
                 flexDirection: 'column',
                 gap: '12px',
               }}>
-                {sessionWrongWords.map((word, i) => (
+                {wrongWords.map((word, i) => (
                   <div
                     key={i}
                     style={{

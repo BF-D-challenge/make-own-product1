@@ -139,7 +139,7 @@ const useAppStore = create((set, get) => ({
       })
 
       if (changed) {
-        saveState({ nickname: state.nickname, dayProgress: newProgress, unlockTimes: newUnlockTimes })
+        saveState({ nickname: state.nickname, dayProgress: newProgress, unlockTimes: newUnlockTimes, lastWrongWords: state.lastWrongWords })
         return { dayProgress: newProgress, unlockTimes: newUnlockTimes }
       }
       return {}
@@ -150,7 +150,7 @@ const useAppStore = create((set, get) => ({
   resetProgress: () => {
     set((state) => {
       const reset = { ...initialDayProgress }
-      saveState({ nickname: state.nickname, dayProgress: reset, unlockTimes: {} })
+      saveState({ nickname: state.nickname, dayProgress: reset, unlockTimes: {}, lastWrongWords: state.lastWrongWords })
       return { dayProgress: reset, unlockTimes: {} }
     })
   },
