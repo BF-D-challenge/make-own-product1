@@ -149,7 +149,7 @@ export default function CompleteScreen() {
                         background: '#CCFF00',
                         borderRadius: '2px',
                         padding: '0 2px',
-                        display: 'inline-block',
+                        display: 'inline',
                       }}>
                         {word.english}
                       </span>
