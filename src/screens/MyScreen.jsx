@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import useAppStore from '../store/useAppStore'
 import mapPath from '../assets/map_path.png'
 import character from '../assets/character.png'
-import bgTexture from '../assets/bg_texture.png'
 import homeIcon from '../assets/home_icon.svg'
 import rockIcon from '../assets/rock_icon.svg'
 
@@ -46,11 +45,7 @@ export default function MyScreen() {
   }
 
   return (
-    <div className="screen" style={{
-      backgroundImage: `url(${bgTexture})`,
-      backgroundSize: '100% 100%',
-      backgroundPosition: 'center top',
-    }}>
+    <div className="screen">
 
       {/* 상단 타이틀 */}
       <div style={{ padding: '56px 24px 12px' }}>

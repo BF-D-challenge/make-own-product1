@@ -80,11 +80,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100svh;
-  background-color: #fff;
-  background-image: url('./assets/bg_texture.png');
-  background-size: cover;
-  background-position: center top;
-  background-repeat: no-repeat;
+  background: transparent;
 }
 
 /* 상단 타이틀 영역 */
