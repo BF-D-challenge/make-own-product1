@@ -91,6 +91,16 @@ const useAppStore = create((set, get) => ({
   selectedAnswer: null,
   quizResult: null,
 
+  // 현재 세션에서 틀린 단어 목록 (저장 안함)
+  sessionWrongWords: [],
+
+  addWrongWord: (word) => set((state) => {
+    if (state.sessionWrongWords.some(w => w.english === word.english)) return {}
+    return { sessionWrongWords: [...state.sessionWrongWords, { english: word.english, korean: word.korean }] }
+  }),
+
+  resetSessionWrong: () => set({ sessionWrongWords: [] }),
+
   // 날 완료 처리 — 다음날 07:00까지 잠금 유지
   completeDay: (day) => {
     set((state) => {

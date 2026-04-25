@@ -23,7 +23,7 @@ export default function QuizScreen() {
   const dayNum = parseInt(day)
   const wordIdx = parseInt(wordIndex)
 
-  const { dayProgress, nickname } = useAppStore()
+  const { dayProgress, nickname, addWrongWord, resetSessionWrong } = useAppStore()
   const hasCompleted = Object.values(dayProgress).some(v => v === 'complete')
 
   const dayData = DAYS.find((d) => d.day === dayNum)
@@ -37,10 +37,11 @@ export default function QuizScreen() {
   const [selectedAnswer, setSelectedAnswer] = useState(null)
   const [quizResult, setQuizResult] = useState(null)
 
-  // 문제 바뀔 때 state 초기화
+  // 문제 바뀔 때 state 초기화 / 첫 문제면 틀린 단어 목록 리셋
   useEffect(() => {
     setSelectedAnswer(null)
     setQuizResult(null)
+    if (wordIdx === 0) resetSessionWrong()
   }, [wordIdx])
 
   useEffect(() => {
@@ -61,6 +62,7 @@ export default function QuizScreen() {
     const correct = choice === word.english
     setSelectedAnswer(choice)
     setQuizResult(correct ? 'correct' : 'wrong')
+    if (!correct) addWrongWord(word)
   }
 
   const goNext = () => {
