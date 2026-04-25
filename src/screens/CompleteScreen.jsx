@@ -198,14 +198,14 @@ export default function CompleteScreen() {
             gap: '2px',
             background: '#fff',
             borderRadius: '999px',
-            width: '54px',
-            height: '54px',
-            boxShadow: '0 0 5px rgba(0,0,0,0.1)',
+            width: '72px',
+            height: '72px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             cursor: 'pointer',
           }}
         >
-          <img src={myIcon} alt="My" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
-          <span style={{ fontFamily: 'Pretendard, sans-serif', fontSize: '12px', fontWeight: '600', color: '#666' }}>My</span>
+          <img src={myIcon} alt="My" style={{ width: '26px', height: '26px', objectFit: 'contain' }} />
+          <span style={{ fontFamily: 'Pretendard, sans-serif', fontSize: '11px', fontWeight: '600', color: '#555' }}>My</span>
         </div>
       </div>
     </div>
