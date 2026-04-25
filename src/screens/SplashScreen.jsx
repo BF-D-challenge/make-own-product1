@@ -12,19 +12,29 @@ export default function SplashScreen() {
     useAppStore.getState().checkAndUnlockDays()
 
     const timer = setTimeout(() => {
-      const { dayProgress } = useAppStore.getState()
+      const { dayProgress, unlockTimes } = useAppStore.getState()
+      const now = Date.now()
 
-      // unlocked 상태인 첫 번째 날 찾기
+      // 1순위: unlocked 상태인 날
       const unlockedEntry = Object.entries(dayProgress)
         .find(([, status]) => status === 'unlocked')
 
       if (unlockedEntry) {
-        // 풀 수 있는 날이 있으면 바로 퀴즈로
         navigate(`/quiz/${unlockedEntry[0]}/0`, { replace: true })
-      } else {
-        // 모두 완료됐거나 잠긴 경우 → My 맵 화면
-        navigate('/my', { replace: true })
+        return
       }
+
+      // 2순위: unlockTimes에 7AM이 지난 날 (checkAndUnlockDays 미반영 폴백)
+      const readyEntry = Object.entries(unlockTimes)
+        .find(([, unlockAt]) => now >= unlockAt)
+
+      if (readyEntry) {
+        navigate(`/quiz/${readyEntry[0]}/0`, { replace: true })
+        return
+      }
+
+      // 풀 수 있는 날 없음 → My 화면
+      navigate('/my', { replace: true })
     }, 1200)
     return () => clearTimeout(timer)
   }, [navigate])
