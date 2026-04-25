@@ -31,20 +31,19 @@
   --font-body: 'Pretendard', sans-serif;
 }
 
-html, body {
+html {
   height: 100%;
-  background: #f0f0f0;
-}
-
-/* iOS Safari 포함 전체 뷰포트 배경 고정 */
-html::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
+  /* 노치/홈바 영역까지 텍스처로 채움 */
   background-image: url('./assets/bg_texture.png');
   background-size: cover;
   background-position: center top;
+  background-repeat: no-repeat;
+  background-attachment: scroll;
+}
+
+body {
+  height: 100%;
+  background: transparent;
 }
 
 /* 노치/홈바 Safe Area 대응 — 콘텐츠가 가려지지 않도록 */
@@ -80,7 +79,10 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100svh;
-  background: transparent;
+  background-image: url('./assets/bg_texture.png');
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
 }
 
 /* 상단 타이틀 영역 */
