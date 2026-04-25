@@ -2,20 +2,28 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import logo from '../assets/logo.png'
 import bgTexture from '../assets/bg_texture.png'
+import useAppStore from '../store/useAppStore'
 
 export default function SplashScreen() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    // 최초 진입 여부 확인 — localStorage에 저장된 상태가 없으면 첫 방문
-    const saved = localStorage.getItem('engseven_state')
-    const isFirstVisit = !saved
+    // 시간 기반 잠금 해제 먼저 처리
+    useAppStore.getState().checkAndUnlockDays()
 
     const timer = setTimeout(() => {
-      if (isFirstVisit) {
-        navigate('/quiz/1/0', { replace: true })  // 첫 방문 → 바로 퀴즈
+      const { dayProgress } = useAppStore.getState()
+
+      // unlocked 상태인 첫 번째 날 찾기
+      const unlockedEntry = Object.entries(dayProgress)
+        .find(([, status]) => status === 'unlocked')
+
+      if (unlockedEntry) {
+        // 풀 수 있는 날이 있으면 바로 퀴즈로
+        navigate(`/quiz/${unlockedEntry[0]}/0`, { replace: true })
       } else {
-        navigate('/my', { replace: true })         // 재방문 → 맵 화면
+        // 모두 완료됐거나 잠긴 경우 → My 맵 화면
+        navigate('/my', { replace: true })
       }
     }, 1200)
     return () => clearTimeout(timer)
