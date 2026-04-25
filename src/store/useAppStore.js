@@ -58,6 +58,7 @@ function saveState(state) {
     nickname: state.nickname,
     dayProgress: state.dayProgress,
     unlockTimes: state.unlockTimes,
+    lastWrongWords: state.lastWrongWords,
   })
   try {
     localStorage.setItem('engseven_state', data)
@@ -94,6 +95,9 @@ const useAppStore = create((set, get) => ({
   // 현재 세션에서 틀린 단어 목록 (저장 안함)
   sessionWrongWords: [],
 
+  // 마지막 완료 세션의 오답 목록 (localStorage 저장)
+  lastWrongWords: saved?.lastWrongWords || [],
+
   addWrongWord: (word, index) => set((state) => {
     if (state.sessionWrongWords.some(w => w.english === word.english)) return {}
     return { sessionWrongWords: [...state.sessionWrongWords, { english: word.english, korean: word.korean, index }] }
@@ -106,15 +110,14 @@ const useAppStore = create((set, get) => ({
     set((state) => {
       const newProgress = { ...state.dayProgress, [day]: 'complete' }
       const newUnlockTimes = { ...state.unlockTimes }
+      const lastWrongWords = [...state.sessionWrongWords] // 현재 세션 오답 저장
 
       if (day < 7) {
-        // 다음날 07:00에 해제 예약
         newUnlockTimes[day + 1] = nextDay7AM()
       }
-      // day === 7이면 unlockTimes 추가 없음 (resetProgress로 처리)
 
-      saveState({ nickname: state.nickname, dayProgress: newProgress, unlockTimes: newUnlockTimes })
-      return { dayProgress: newProgress, unlockTimes: newUnlockTimes }
+      saveState({ nickname: state.nickname, dayProgress: newProgress, unlockTimes: newUnlockTimes, lastWrongWords })
+      return { dayProgress: newProgress, unlockTimes: newUnlockTimes, lastWrongWords }
     })
   },
 

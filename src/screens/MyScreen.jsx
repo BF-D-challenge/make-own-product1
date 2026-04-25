@@ -34,7 +34,7 @@ export default function MyScreen() {
       .filter(([, v]) => v === 'complete')
       .map(([k]) => parseInt(k))
     const lastCompleted = completedDays.length > 0 ? Math.max(...completedDays) : 1
-    navigate(`/complete/${lastCompleted}`)
+    navigate(`/complete/${lastCompleted}`, { state: { fromHome: true } })
   }
 
   const handleDayClick = (day) => {

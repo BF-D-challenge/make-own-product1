@@ -11,19 +11,23 @@ export default function CompleteScreen() {
   const { day } = useParams()
   const location = useLocation()
   const dayNum = parseInt(day)
-  const { completeDay, resetProgress, nickname, sessionWrongWords } = useAppStore()
-  const hasPerfect = sessionWrongWords.length === 0
+  const { completeDay, resetProgress, nickname, sessionWrongWords, lastWrongWords } = useAppStore()
 
-  // 틀린 단어의 인덱스(0-based) 배열
-  const wrongIndices = sessionWrongWords.map(w => w.index)
+  const fromQuiz = location.state?.fromQuiz
+  const fromHome = location.state?.fromHome
+
+  // 진입 경로에 따라 오답 목록 결정
+  const wrongWords = fromHome ? lastWrongWords : sessionWrongWords
+  const hasPerfect = wrongWords.length === 0
+  const wrongIndices = wrongWords.map(w => w.index)
 
   useEffect(() => {
-    // 퀴즈에서 정상적으로 온 게 아니면(새로고침/직접 URL 접근) → My로 이동
-    if (!location.state?.fromQuiz) {
+    // 퀴즈 또는 홈에서 온 게 아니면(새로고침/직접 URL 접근) → My로 이동
+    if (!fromQuiz && !fromHome) {
       navigate('/my', { replace: true })
       return
     }
-    completeDay(dayNum)
+    if (fromQuiz) completeDay(dayNum)
   }, [dayNum])
 
   const goToMy = () => {
