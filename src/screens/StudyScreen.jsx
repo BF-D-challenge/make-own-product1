@@ -165,22 +165,30 @@ export default function StudyScreen() {
       {/* 하단 My 버튼 — 최초 진입(완료한 날 없음)엔 숨김 */}
       <div style={{ padding: '16px 24px 36px', display: 'flex', justifyContent: 'flex-end' }}>
         {hasCompleted && (
-          <button onClick={goToMy} style={{
-            background: 'none', border: 'none', cursor: 'pointer',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px',
-          }}>
-            <div style={{
-              width: '44px', height: '44px', borderRadius: '50%',
-              background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-            }}>
-              <img src={myIcon} alt="My" style={{ width: '24px', height: '24px', objectFit: 'contain' }} />
-            </div>
+          <div
+            onClick={goToMy}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '4px',
+              background: '#fff',
+              borderRadius: '999px',
+              width: '72px',
+              height: '72px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              cursor: 'pointer',
+            }}
+          >
+            <img src={myIcon} alt="My" style={{ width: '26px', height: '26px', objectFit: 'contain' }} />
             <span style={{
-              fontFamily: 'Pretendard, sans-serif', fontSize: '11px',
-              fontWeight: '600', color: '#888',
+              fontFamily: 'Pretendard, sans-serif',
+              fontSize: '11px',
+              fontWeight: '600',
+              color: '#555',
             }}>My</span>
-          </button>
+          </div>
         )}
       </div>
     </div>
