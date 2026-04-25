@@ -25,14 +25,10 @@ export default function StepIndicator({ total = 10, current = 0, allComplete = f
         } else {
           const isComplete = allComplete || i < current
           const isActive = !allComplete && i === current
-          const isWrongDone = wrongDoneIndices.includes(i)
           bgColor = allComplete
             ? '#4CAF50'
-            : isActive && wrongCurrent ? '#F04523'   // 현재 문제 오답
-            : isComplete && isWrongDone ? '#F04523'  // 지나간 오답
-            : isComplete ? '#4CAF50'                 // 지나간 정답
-            : isActive   ? '#444444'                 // 현재 (미선택)
-            : '#DDDDDD'                              // 미래
+            : (isComplete || isActive) ? '#444444'
+            : '#DDDDDD'
           size = isActive ? '24px' : '20px'
           fontSize = isActive ? '12px' : '10px'
         }
