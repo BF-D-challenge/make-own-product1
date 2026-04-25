@@ -95,7 +95,7 @@ export default function QuizScreen() {
 
       {/* 콘텐츠 */}
       <div style={{ flex: 1, padding: '0 24px', display: 'flex', flexDirection: 'column' }}>
-        <StepIndicator total={10} current={wordIdx} />
+        <StepIndicator total={10} current={wordIdx} wrongCurrent={quizResult === 'wrong'} />
 
         {/* 퀴즈 카드 */}
         <div style={{

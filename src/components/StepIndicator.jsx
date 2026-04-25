@@ -1,7 +1,7 @@
 // 상단 1~10 진행 도트 컴포넌트
 // wrongIndices: Set or Array — 완료 화면에서 틀린 번호(0-based)를 전달하면 빨간/초록으로 구분
 
-export default function StepIndicator({ total = 10, current = 0, allComplete = false, wrongIndices = null }) {
+export default function StepIndicator({ total = 10, current = 0, allComplete = false, wrongIndices = null, wrongCurrent = false }) {
   return (
     <div style={{
       display: 'flex',
@@ -27,8 +27,9 @@ export default function StepIndicator({ total = 10, current = 0, allComplete = f
           const isActive = !allComplete && i === current
           bgColor = allComplete
             ? '#4CAF50'
+            : isActive && wrongCurrent ? '#F04523'  // 현재 문제 오답
             : isComplete ? '#4CAF50'
-            : isActive  ? '#444444'
+            : isActive   ? '#444444'
             : '#DDDDDD'
           size = isActive ? '24px' : '20px'
           fontSize = isActive ? '12px' : '10px'
