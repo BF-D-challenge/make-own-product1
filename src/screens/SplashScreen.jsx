@@ -1,17 +1,38 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import logo from '../assets/logo.png'
-import bgTexture from '../assets/bg_texture.png'
+import bgTexture from '../assets/bg_texture.jpg'
+import mapPath from '../assets/map_path.png'
+import character from '../assets/character.png'
+import complete100 from '../assets/complete_100.png'
 import useAppStore from '../store/useAppStore'
+
+// 이미지 URL만 미리 import해서 preload에 사용
+import myIconUrl from '../assets/my_icon.svg'
+import homeIconUrl from '../assets/home_icon.svg'
+import rockIconUrl from '../assets/rock_icon.svg'
+
+function preloadImages(urls) {
+  urls.forEach(url => {
+    const img = new Image()
+    img.src = url
+  })
+}
 
 export default function SplashScreen() {
   const navigate = useNavigate()
 
   useEffect(() => {
+    // 스플래시 대기 시간(1200ms) 동안 다음 화면 에셋 선제 로드
+    preloadImages([bgTexture, mapPath, character, complete100, myIconUrl, homeIconUrl, rockIconUrl])
+
     // 시간 기반 잠금 해제 먼저 처리
     useAppStore.getState().checkAndUnlockDays()
 
     const timer = setTimeout(() => {
+      // 스플래시 표시 완료 표시 — 이후 다른 화면 직접 접근 허용
+      sessionStorage.setItem('splashShown', 'true')
+
       const { dayProgress, unlockTimes } = useAppStore.getState()
       const now = Date.now()
 

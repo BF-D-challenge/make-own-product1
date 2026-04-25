@@ -2,7 +2,8 @@
 
 @font-face {
   font-family: 'BM kkubulim';
-  src: url('./assets/BMKkubulimTTF.ttf') format('truetype');
+  src: url('./assets/BMKkubulim.woff2') format('woff2'),
+       url('./assets/BMKkubulimTTF.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: block; /* 로딩 전 보이지 않게 → 크기 변동 없음 */
@@ -70,12 +71,19 @@ body {
   overflow: hidden;
 }
 
+/* 공통 fade-in */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 /* 공통 화면 레이아웃 */
 .screen {
   display: flex;
   flex-direction: column;
   min-height: 100svh;
   background: transparent;
+  animation: fadeIn 0.25s ease;
 }
 
 /* 상단 타이틀 영역 */
