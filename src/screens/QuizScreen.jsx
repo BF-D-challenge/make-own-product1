@@ -62,7 +62,7 @@ export default function QuizScreen() {
     const correct = choice === word.english
     setSelectedAnswer(choice)
     setQuizResult(correct ? 'correct' : 'wrong')
-    if (!correct) addWrongWord(word)
+    if (!correct) addWrongWord(word, wordIdx)
   }
 
   const goNext = () => {

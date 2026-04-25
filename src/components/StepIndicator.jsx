@@ -1,6 +1,7 @@
 // 상단 1~10 진행 도트 컴포넌트
+// wrongIndices: Set or Array — 완료 화면에서 틀린 번호(0-based)를 전달하면 빨간/초록으로 구분
 
-export default function StepIndicator({ total = 10, current = 0, allComplete = false }) {
+export default function StepIndicator({ total = 10, current = 0, allComplete = false, wrongIndices = null }) {
   return (
     <div style={{
       display: 'flex',
@@ -9,20 +10,29 @@ export default function StepIndicator({ total = 10, current = 0, allComplete = f
       marginBottom: '20px',
     }}>
       {Array.from({ length: total }, (_, i) => {
-        const isComplete = allComplete || i < current
-        const isActive = !allComplete && i === current
+        let bgColor
+        let size
+        let fontSize
 
-        const bgColor = allComplete
-          ? '#4CAF50'
-          : isComplete
+        if (wrongIndices !== null) {
+          // 완료 화면 — 틀린 건 빨강, 맞은 건 초록
+          const isWrong = Array.isArray(wrongIndices)
+            ? wrongIndices.includes(i)
+            : wrongIndices.has(i)
+          bgColor = isWrong ? '#F04523' : '#31A552'
+          size = '26px'
+          fontSize = '12px'
+        } else {
+          const isComplete = allComplete || i < current
+          const isActive = !allComplete && i === current
+          bgColor = allComplete
             ? '#4CAF50'
-            : isActive
-              ? '#444444'
-              : '#DDDDDD'
-
-        const size = isActive ? '24px' : '20px'
-        const fontSize = isActive ? '12px' : '10px'
-        const textColor = '#fff'
+            : isComplete ? '#4CAF50'
+            : isActive  ? '#444444'
+            : '#DDDDDD'
+          size = isActive ? '24px' : '20px'
+          fontSize = isActive ? '12px' : '10px'
+        }
 
         return (
           <div
@@ -40,7 +50,7 @@ export default function StepIndicator({ total = 10, current = 0, allComplete = f
             }}
           >
             <span style={{
-              color: textColor,
+              color: '#fff',
               fontSize: fontSize,
               fontFamily: 'BM kkubulim, sans-serif',
               lineHeight: 1,

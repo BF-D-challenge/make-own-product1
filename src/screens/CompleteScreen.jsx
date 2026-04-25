@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import useAppStore from '../store/useAppStore'
 import StepIndicator from '../components/StepIndicator'
 import complete100 from '../assets/complete_100.png'
+import lineStroke from '../assets/line_stroke.svg'
 import myIcon from '../assets/my_icon.svg'
 
 export default function CompleteScreen() {
@@ -11,6 +12,9 @@ export default function CompleteScreen() {
   const dayNum = parseInt(day)
   const { completeDay, resetProgress, nickname, sessionWrongWords } = useAppStore()
   const hasPerfect = sessionWrongWords.length === 0
+
+  // 틀린 단어의 인덱스(0-based) 배열
+  const wrongIndices = sessionWrongWords.map(w => w.index)
 
   useEffect(() => {
     completeDay(dayNum)
@@ -42,7 +46,14 @@ export default function CompleteScreen() {
 
       {/* 콘텐츠 */}
       <div style={{ flex: 1, padding: '0 24px', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <StepIndicator total={10} current={10} allComplete />
+
+        {/* 스텝 인디케이터 — 맞은 건 초록, 틀린 건 빨강 */}
+        <StepIndicator
+          total={10}
+          current={10}
+          allComplete={hasPerfect}
+          wrongIndices={hasPerfect ? null : wrongIndices}
+        />
 
         {/* 카드 */}
         <div
@@ -50,17 +61,23 @@ export default function CompleteScreen() {
             flex: 1,
             background: '#fff',
             borderRadius: '16px',
-            padding: hasPerfect ? '40px 24px' : '24px',
+            padding: '20px 20px 16px',
             display: 'flex',
             flexDirection: 'column',
-            alignItems: hasPerfect ? 'center' : 'flex-start',
-            justifyContent: hasPerfect ? 'center' : 'flex-start',
-            gap: '12px',
-            overflowY: 'auto',
+            overflow: 'hidden',
+            gap: '16px',
           }}
         >
           {hasPerfect ? (
-            <>
+            /* ── 100점 화면 ── */
+            <div style={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '20px',
+            }}>
               <img
                 src={complete100}
                 alt="100점"
@@ -88,60 +105,79 @@ export default function CompleteScreen() {
                 오늘의 10단어를 모두 맞혔어요!<br />
                 내일도 10단어만 더 해볼까요?
               </p>
-            </>
+            </div>
           ) : (
+            /* ── 오답 화면 ── */
             <>
-              <p style={{
-                fontFamily: 'Pretendard, sans-serif',
-                fontSize: '13px',
-                fontWeight: '600',
-                color: '#999',
-                marginBottom: '4px',
+              {/* 틀린 단어 목록 — 내부 스크롤 */}
+              <div style={{
+                flex: 1,
+                overflowY: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
               }}>
-                틀린 단어 {sessionWrongWords.length}개 — 다시 확인해봐요
-              </p>
+                {sessionWrongWords.map((word, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'flex-start',
+                      gap: '8px',
+                    }}
+                  >
+                    {/* 왼쪽 세로 선 */}
+                    <img
+                      src={lineStroke}
+                      alt=""
+                      style={{
+                        width: '3px',
+                        flexShrink: 0,
+                        alignSelf: 'stretch',
+                        objectFit: 'fill',
+                      }}
+                    />
+                    {/* 단어 내용 */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      {/* 영단어 — 라임 하이라이트 */}
+                      <span style={{
+                        fontFamily: 'Pretendard, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: '500',
+                        color: '#444',
+                        background: '#CCFF00',
+                        borderRadius: '2px',
+                        padding: '0 2px',
+                        display: 'inline-block',
+                      }}>
+                        {word.english}
+                      </span>
+                      {/* 한국어 뜻 */}
+                      <span style={{
+                        fontFamily: 'Pretendard, sans-serif',
+                        fontSize: '16px',
+                        fontWeight: '500',
+                        color: '#444',
+                      }}>
+                        {word.korean}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
 
-              {sessionWrongWords.map((word, i) => (
-                <div
-                  key={i}
-                  style={{
-                    width: '100%',
-                    padding: '14px 16px',
-                    background: '#FFF3F1',
-                    borderRadius: '12px',
-                    borderLeft: '4px solid #F4A49A',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '3px',
-                  }}
-                >
-                  <span style={{
-                    fontFamily: 'Pretendard, sans-serif',
-                    fontSize: '16px',
-                    fontWeight: '700',
-                    color: '#333',
-                  }}>
-                    {word.english}
-                  </span>
-                  <span style={{
-                    fontFamily: 'Pretendard, sans-serif',
-                    fontSize: '13px',
-                    fontWeight: '400',
-                    color: '#777',
-                  }}>
-                    {word.korean}
-                  </span>
-                </div>
-              ))}
-
+              {/* 하단 고정 메시지 */}
               <p style={{
                 fontFamily: 'Pretendard, sans-serif',
-                fontSize: '14px',
+                fontSize: '16px',
                 fontWeight: '500',
-                color: '#aaa',
-                marginTop: '4px',
-                lineHeight: 1.6,
+                color: '#444',
+                textAlign: 'center',
+                lineHeight: 1.5,
+                flexShrink: 0,
               }}>
+                오늘의 오답이에요!<br />
                 내일도 10단어만 더 해볼까요?
               </p>
             </>
@@ -150,7 +186,7 @@ export default function CompleteScreen() {
       </div>
 
       {/* 하단 My 버튼 */}
-      <div style={{ padding: '16px 24px 36px', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', flexShrink: 0 }}>
+      <div style={{ padding: '12px 24px 32px', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', flexShrink: 0 }}>
         <div
           onClick={goToMy}
           style={{
@@ -158,17 +194,17 @@ export default function CompleteScreen() {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '4px',
+            gap: '2px',
             background: '#fff',
             borderRadius: '999px',
-            width: '72px',
-            height: '72px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            width: '54px',
+            height: '54px',
+            boxShadow: '0 0 5px rgba(0,0,0,0.1)',
             cursor: 'pointer',
           }}
         >
-          <img src={myIcon} alt="My" style={{ width: '26px', height: '26px', objectFit: 'contain' }} />
-          <span style={{ fontFamily: 'Pretendard, sans-serif', fontSize: '11px', fontWeight: '600', color: '#555' }}>My</span>
+          <img src={myIcon} alt="My" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
+          <span style={{ fontFamily: 'Pretendard, sans-serif', fontSize: '12px', fontWeight: '600', color: '#666' }}>My</span>
         </div>
       </div>
     </div>

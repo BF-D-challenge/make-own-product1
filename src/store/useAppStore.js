@@ -94,9 +94,9 @@ const useAppStore = create((set, get) => ({
   // 현재 세션에서 틀린 단어 목록 (저장 안함)
   sessionWrongWords: [],
 
-  addWrongWord: (word) => set((state) => {
+  addWrongWord: (word, index) => set((state) => {
     if (state.sessionWrongWords.some(w => w.english === word.english)) return {}
-    return { sessionWrongWords: [...state.sessionWrongWords, { english: word.english, korean: word.korean }] }
+    return { sessionWrongWords: [...state.sessionWrongWords, { english: word.english, korean: word.korean, index }] }
   }),
 
   resetSessionWrong: () => set({ sessionWrongWords: [] }),
