@@ -2,11 +2,10 @@
 
 @font-face {
   font-family: 'BM kkubulim';
-  src: url('./assets/BMKkubulim.woff2') format('woff2'),
-       url('./assets/BMKkubulimTTF.ttf') format('truetype');
+  src: url('/BMKkubulim.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
-  font-display: block; /* 로딩 전 보이지 않게 → 크기 변동 없음 */
+  font-display: swap; /* 서브셋 238KB, swap으로 텍스트 즉시 표시 후 폰트 교체 */
   size-adjust: 100%;
 }
 

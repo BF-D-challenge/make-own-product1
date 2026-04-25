@@ -19,12 +19,21 @@ function preloadImages(urls) {
   })
 }
 
+// lazy chunk도 스플래시 대기 중 미리 fetch
+function preloadChunks() {
+  import('../screens/MyScreen')
+  import('../screens/QuizScreen')
+  import('../screens/StudyScreen')
+  import('../screens/CompleteScreen')
+}
+
 export default function SplashScreen() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    // 스플래시 대기 시간(1200ms) 동안 다음 화면 에셋 선제 로드
+    // 스플래시 대기 시간(1200ms) 동안 다음 화면 에셋 + JS 청크 선제 로드
     preloadImages([bgTexture, mapPath, character, complete100, myIconUrl, homeIconUrl, rockIconUrl])
+    preloadChunks()
 
     // 시간 기반 잠금 해제 먼저 처리
     useAppStore.getState().checkAndUnlockDays()
