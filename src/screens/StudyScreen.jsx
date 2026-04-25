@@ -162,32 +162,30 @@ export default function StudyScreen() {
         </div>
       </div>
 
-      {/* My 버튼 — 항상 우측 하단 고정 */}
-      {hasCompleted && (
-        <div
-          onClick={goToMy}
-          style={{
-            position: 'fixed',
-            right: '24px',
-            bottom: 'max(28px, env(safe-area-inset-bottom, 28px))',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '4px',
-            background: '#fff',
-            borderRadius: '999px',
-            width: '72px',
-            height: '72px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            cursor: 'pointer',
-            zIndex: 10,
-          }}
-        >
-          <img src={myIcon} alt="My" style={{ width: '26px', height: '26px', objectFit: 'contain' }} />
-          <span style={{ fontFamily: 'Pretendard, sans-serif', fontSize: '11px', fontWeight: '600', color: '#555' }}>My</span>
-        </div>
-      )}
+      {/* My 버튼 — 카드 아래, 우측 정렬 */}
+      <div style={{ padding: '16px 24px 36px', display: 'flex', justifyContent: 'flex-end' }}>
+        {hasCompleted && (
+          <div
+            onClick={goToMy}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '4px',
+              background: '#fff',
+              borderRadius: '999px',
+              width: '72px',
+              height: '72px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              cursor: 'pointer',
+            }}
+          >
+            <img src={myIcon} alt="My" style={{ width: '26px', height: '26px', objectFit: 'contain' }} />
+            <span style={{ fontFamily: 'Pretendard, sans-serif', fontSize: '11px', fontWeight: '600', color: '#555' }}>My</span>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
