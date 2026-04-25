@@ -67,7 +67,7 @@ export default function QuizScreen() {
 
   const goNext = () => {
     const nextIdx = wordIdx + 1
-    if (nextIdx >= 10) navigate(`/complete/${day}`)
+    if (nextIdx >= 10) navigate(`/complete/${day}`, { state: { fromQuiz: true } })
     else navigate(`/quiz/${day}/${nextIdx}`)
   }
 

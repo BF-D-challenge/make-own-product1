@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import useAppStore from '../store/useAppStore'
 import StepIndicator from '../components/StepIndicator'
 import complete100 from '../assets/complete_100.png'
@@ -9,6 +9,7 @@ import myIcon from '../assets/my_icon.svg'
 export default function CompleteScreen() {
   const navigate = useNavigate()
   const { day } = useParams()
+  const location = useLocation()
   const dayNum = parseInt(day)
   const { completeDay, resetProgress, nickname, sessionWrongWords } = useAppStore()
   const hasPerfect = sessionWrongWords.length === 0
@@ -17,6 +18,11 @@ export default function CompleteScreen() {
   const wrongIndices = sessionWrongWords.map(w => w.index)
 
   useEffect(() => {
+    // 퀴즈에서 정상적으로 온 게 아니면(새로고침/직접 URL 접근) → My로 이동
+    if (!location.state?.fromQuiz) {
+      navigate('/my', { replace: true })
+      return
+    }
     completeDay(dayNum)
   }, [dayNum])
 
