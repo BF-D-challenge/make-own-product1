@@ -150,6 +150,7 @@ export default function CompleteScreen() {
                         borderRadius: '2px',
                         padding: '0 2px',
                         display: 'inline',
+                        alignSelf: 'flex-start',
                       }}>
                         {word.english}
                       </span>
