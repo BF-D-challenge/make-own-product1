@@ -7,12 +7,20 @@ import eastIcon from '../assets/east_icon.svg'
 import lineStroke from '../assets/line_stroke.svg'
 import myIcon from '../assets/my_icon.svg'
 
-// 단어별 데이터 캐시 (오디오 URL + 예문)
+// 단어별 데이터 캐시 (오디오 URL + 예문 + 한국어 번역)
 const wordDataCache = {}
+
+async function translateToKorean(text) {
+  const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|ko`
+  const res = await fetch(url)
+  const data = await res.json()
+  return data?.responseData?.translatedText ?? null
+}
 
 function usePronunciation(word) {
   const [audioUrl, setAudioUrl] = useState(null)
   const [example, setExample] = useState(null)
+  const [exampleKo, setExampleKo] = useState(null)
   const [playing, setPlaying] = useState(false)
   const audioRef = useRef(null)
 
@@ -20,17 +28,19 @@ function usePronunciation(word) {
     if (!word) return
     setAudioUrl(null)
     setExample(null)
+    setExampleKo(null)
     const key = word.toLowerCase()
 
     if (wordDataCache[key]) {
       setAudioUrl(wordDataCache[key].audio)
       setExample(wordDataCache[key].example)
+      setExampleKo(wordDataCache[key].exampleKo)
       return
     }
 
     fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${key}`)
       .then(r => r.json())
-      .then(data => {
+      .then(async (data) => {
         const entry = data?.[0]
         const phonetics = entry?.phonetics ?? []
         const audio = phonetics.find(p => p.audio)?.audio ?? null
@@ -44,9 +54,16 @@ function usePronunciation(word) {
           if (ex) break
         }
 
-        wordDataCache[key] = { audio, example: ex }
+        // 예문이 있으면 한국어 번역
+        let exKo = null
+        if (ex) {
+          exKo = await translateToKorean(ex).catch(() => null)
+        }
+
+        wordDataCache[key] = { audio, example: ex, exampleKo: exKo }
         setAudioUrl(audio)
         setExample(ex)
+        setExampleKo(exKo)
       })
       .catch(() => {})
   }, [word])
@@ -62,7 +79,7 @@ function usePronunciation(word) {
     audio.onerror = () => setPlaying(false)
   }
 
-  return { canPlay: !!audioUrl, playing, play, example }
+  return { canPlay: !!audioUrl, playing, play, example, exampleKo }
 }
 
 // 예문에서 {word} → 노란 하이라이트 파싱
@@ -110,7 +127,7 @@ export default function StudyScreen() {
   }, [apiQ, localWord])
 
   // hook은 early return 전에 항상 호출해야 함 (Rules of Hooks)
-  const { canPlay, playing, play, example: dictExample } = usePronunciation(word?.english ?? '')
+  const { canPlay, playing, play, example: dictExample, exampleKo: dictExampleKo } = usePronunciation(word?.english ?? '')
 
   if (!word) return null
 
@@ -285,6 +302,17 @@ export default function StudyScreen() {
                   }}>
                     "{dictExample}"
                   </p>
+                  {dictExampleKo && (
+                    <p style={{
+                      fontFamily: 'Pretendard, sans-serif',
+                      fontSize: '13px',
+                      fontWeight: '400',
+                      color: '#888',
+                      lineHeight: 1.6,
+                    }}>
+                      {dictExampleKo}
+                    </p>
+                  )}
                 </>
               )}
 
