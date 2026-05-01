@@ -1,10 +1,47 @@
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useRef, useState, useEffect } from 'react'
 import { DAYS } from '../data/words'
 import useAppStore from '../store/useAppStore'
 import StepIndicator from '../components/StepIndicator'
 import eastIcon from '../assets/east_icon.svg'
 import lineStroke from '../assets/line_stroke.svg'
 import myIcon from '../assets/my_icon.svg'
+
+// 단어별 오디오 URL 캐시 (화면 전환 시 재요청 방지)
+const audioCache = {}
+
+function usePronunciation(word) {
+  const [audioUrl, setAudioUrl] = useState(null)
+  const [playing, setPlaying] = useState(false)
+  const audioRef = useRef(null)
+
+  useEffect(() => {
+    setAudioUrl(null)
+    const key = word.toLowerCase()
+    if (audioCache[key]) { setAudioUrl(audioCache[key]); return }
+
+    fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${key}`)
+      .then(r => r.json())
+      .then(data => {
+        const phonetics = data?.[0]?.phonetics ?? []
+        const url = phonetics.find(p => p.audio)?.audio ?? null
+        if (url) { audioCache[key] = url; setAudioUrl(url) }
+      })
+      .catch(() => {})
+  }, [word])
+
+  const play = () => {
+    if (!audioUrl || playing) return
+    if (audioRef.current) audioRef.current.pause()
+    const audio = new Audio(audioUrl)
+    audioRef.current = audio
+    setPlaying(true)
+    audio.play()
+    audio.onended = () => setPlaying(false)
+    audio.onerror = () => setPlaying(false)
+  }
+
+  return { canPlay: !!audioUrl, playing, play }
+}
 
 // 예문에서 {word} → 노란 하이라이트 파싱
 function parseExample(example) {
@@ -35,6 +72,8 @@ export default function StudyScreen() {
   if (!dayData) return null
   const word = dayData.words[wordIdx]
   if (!word) return null
+
+  const { canPlay, playing, play } = usePronunciation(word.english)
 
   const handleNext = () => {
     const nextIdx = wordIdx + 1
@@ -79,17 +118,50 @@ export default function StudyScreen() {
           display: 'flex',
           flexDirection: 'column',
         }}>
-          {/* 영단어 */}
-          <h2 style={{
-            fontFamily: 'Pretendard, sans-serif',
-            fontSize: '30px',
-            fontWeight: '700',
-            color: '#444',
-            marginBottom: '8px',
-            lineHeight: 1.2,
-          }}>
-            {word.english}
-          </h2>
+          {/* 영단어 + 발음 버튼 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+            <h2 style={{
+              fontFamily: 'Pretendard, sans-serif',
+              fontSize: '30px',
+              fontWeight: '700',
+              color: '#444',
+              lineHeight: 1.2,
+              margin: 0,
+            }}>
+              {word.english}
+            </h2>
+            {canPlay && (
+              <button
+                onClick={play}
+                style={{
+                  background: playing ? '#CCFF00' : '#F5F5F5',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '36px',
+                  height: '36px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  transition: 'background 0.15s ease',
+                }}
+              >
+                {/* 스피커 아이콘 */}
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M11 5L6 9H2v6h4l5 4V5z" fill="#444"/>
+                  {playing ? (
+                    <>
+                      <path d="M19.07 4.93a10 10 0 010 14.14" stroke="#444" strokeWidth="2" strokeLinecap="round"/>
+                      <path d="M15.54 8.46a5 5 0 010 7.07" stroke="#444" strokeWidth="2" strokeLinecap="round"/>
+                    </>
+                  ) : (
+                    <path d="M15.54 8.46a5 5 0 010 7.07" stroke="#444" strokeWidth="2" strokeLinecap="round"/>
+                  )}
+                </svg>
+              </button>
+            )}
+          </div>
 
           {/* 한국어 뜻 */}
           <p style={{
