@@ -1,4 +1,5 @@
-import { useNavigate, useParams, useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { DAYS } from '../data/words'
 import useAppStore from '../store/useAppStore'
 import StepIndicator from '../components/StepIndicator'
