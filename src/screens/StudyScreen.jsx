@@ -69,11 +69,12 @@ export default function StudyScreen() {
   const wordIdx = parseInt(wordIndex)
 
   const dayData = DAYS.find((d) => d.day === dayNum)
-  if (!dayData) return null
-  const word = dayData.words[wordIdx]
-  if (!word) return null
+  const word = dayData?.words[wordIdx] ?? null
 
-  const { canPlay, playing, play } = usePronunciation(word.english)
+  // hook은 early return 전에 항상 호출해야 함 (Rules of Hooks)
+  const { canPlay, playing, play } = usePronunciation(word?.english ?? '')
+
+  if (!dayData || !word) return null
 
   const handleNext = () => {
     const nextIdx = wordIdx + 1
