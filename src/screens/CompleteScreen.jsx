@@ -232,7 +232,7 @@ export default function CompleteScreen() {
               letterSpacing: '0.01em',
             }}
           >
-            다시 도전하기
+            이번 7일 문제 복습하기
           </button>
         </div>
       )}
