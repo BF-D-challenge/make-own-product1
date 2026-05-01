@@ -4,8 +4,12 @@ import { DAYS } from '../data/words'
 import useAppStore from '../store/useAppStore'
 import StepIndicator from '../components/StepIndicator'
 import QuizOption from '../components/QuizOption'
-import eastIcon from '../assets/east_icon.svg'
 import myIcon from '../assets/my_icon.svg'
+
+// 개발: Vite 프록시(/quiz-api) 사용, 프로덕션: 직접 호출
+const QUIZ_API = import.meta.env.DEV
+  ? '/quiz-api/api/v1/quiz'
+  : 'http://www.baec23.com:20001/api/v1/quiz'
 
 // choices 배열 셔플 (Fisher-Yates)
 function shuffle(arr) {
@@ -23,46 +27,97 @@ export default function QuizScreen() {
   const dayNum = parseInt(day)
   const wordIdx = parseInt(wordIndex)
 
-  const { dayProgress, nickname, addWrongWord, resetSessionWrong } = useAppStore()
+  const {
+    dayProgress, nickname,
+    addWrongWord, resetSessionWrong,
+    apiQuestions, setApiQuestions,
+  } = useAppStore()
   const hasCompleted = Object.values(dayProgress).some(v => v === 'complete')
 
-  const dayData = DAYS.find((d) => d.day === dayNum)
-  const word = dayData?.words[wordIdx]
+  // ── API 문제 fetch (첫 문제 진입 시, 캐시 없으면) ──
+  useEffect(() => {
+    if (wordIdx === 0) {
+      resetSessionWrong()
+      if (!apiQuestions[dayNum]) {
+        fetch(QUIZ_API)
+          .then(r => r.json())
+          .then(data => {
+            if (data.questions?.length > 0) setApiQuestions(dayNum, data.questions)
+          })
+          .catch(() => {})
+      }
+    }
+  }, [dayNum])
 
-  const shuffledChoices = useMemo(() => {
-    if (!word) return []
-    return shuffle(word.choices)
-  }, [word])
+  // ── 데이터 결정: API 우선, 없으면 로컬 fallback ──
+  const apiQ = apiQuestions[dayNum]?.[wordIdx]       // API 문제
+  const localDayData = DAYS.find(d => d.day === dayNum)
+  const localWord = localDayData?.words[wordIdx]     // 로컬 단어
+
+  // ── 셔플 (API: option 객체 배열 / 로컬: 문자열 배열) ──
+  const shuffledApiOptions = useMemo(
+    () => (apiQ ? shuffle(apiQ.options) : []),
+    [apiQ]
+  )
+  const shuffledLocalChoices = useMemo(
+    () => (localWord ? shuffle(localWord.choices) : []),
+    [localWord]
+  )
 
   const [selectedAnswer, setSelectedAnswer] = useState(null)
   const [quizResult, setQuizResult] = useState(null)
 
-  // 문제 바뀔 때 state 초기화 / 첫 문제면 틀린 단어 목록 리셋
+  // 문제 바뀔 때 초기화
   useEffect(() => {
     setSelectedAnswer(null)
     setQuizResult(null)
-    if (wordIdx === 0) resetSessionWrong()
   }, [wordIdx])
 
+  // 결과에 따른 화면 이동
   useEffect(() => {
     if (quizResult === 'correct') {
-      const timer = setTimeout(() => goNext(), 300)
-      return () => clearTimeout(timer)
+      const t = setTimeout(goNext, 300)
+      return () => clearTimeout(t)
     }
     if (quizResult === 'wrong') {
-      const timer = setTimeout(() => navigate(`/study/${day}/${wordIndex}`), 1200)
-      return () => clearTimeout(timer)
+      const t = setTimeout(() => navigate(`/study/${day}/${wordIndex}`), 1200)
+      return () => clearTimeout(t)
     }
   }, [quizResult])
 
-  if (!word) return null
+  if (!apiQ && !localWord) return null
 
-  const handleSelect = (choice) => {
+  // ── 이벤트 핸들러 & 상태 계산 ──
+  const handleSelectApi = (option) => {
     if (quizResult) return
-    const correct = choice === word.english
+    const correct = option.id === apiQ.correctOptionId
+    setSelectedAnswer(option.id)
+    setQuizResult(correct ? 'correct' : 'wrong')
+    if (!correct) addWrongWord({ english: apiQ.term, korean: apiQ.koreanDefinition }, wordIdx)
+  }
+
+  const getStatusApi = (option) => {
+    if (!selectedAnswer) return 'default'
+    if (option.id === apiQ.correctOptionId && quizResult === 'correct') return 'correct'
+    if (option.id === selectedAnswer && quizResult === 'wrong') return 'wrong'
+    if (selectedAnswer) return 'disabled'
+    return 'default'
+  }
+
+  const handleSelectLocal = (choice) => {
+    if (quizResult) return
+    const correct = choice === localWord.english
     setSelectedAnswer(choice)
     setQuizResult(correct ? 'correct' : 'wrong')
-    if (!correct) addWrongWord(word, wordIdx)
+    if (!correct) addWrongWord(localWord, wordIdx)
+  }
+
+  const getStatusLocal = (choice) => {
+    if (!selectedAnswer) return 'default'
+    if (choice === localWord.english && quizResult === 'correct') return 'correct'
+    if (choice === selectedAnswer && quizResult === 'wrong') return 'wrong'
+    if (selectedAnswer) return 'disabled'
+    return 'default'
   }
 
   const goNext = () => {
@@ -73,17 +128,12 @@ export default function QuizScreen() {
 
   const goToMy = () => navigate('/my')
 
-  const getOptionStatus = (choice) => {
-    if (!selectedAnswer) return 'default'
-    if (choice === word.english && quizResult === 'correct') return 'correct'
-    if (choice === selectedAnswer && quizResult === 'wrong') return 'wrong'
-    if (selectedAnswer) return 'disabled'
-    return 'default'
-  }
+  // ── 공통 레이아웃 ──
+  const questionText = apiQ ? apiQ.term : (localWord?.korean ?? '')
 
   return (
     <div className="screen">
-      {/* 상단 타이틀 — BM kkubulim, 두 줄 동일 크기 */}
+      {/* 상단 타이틀 */}
       <div style={{ padding: '52px 24px 16px' }}>
         <p style={{ fontFamily: 'BM kkubulim, sans-serif', fontSize: '24px', color: '#444', lineHeight: 1.5 }}>
           {nickname}님,
@@ -106,7 +156,6 @@ export default function QuizScreen() {
           display: 'flex',
           flexDirection: 'column',
         }}>
-          {/* 한국어 뜻 — Pretendard */}
           <h2 style={{
             fontFamily: 'Pretendard, sans-serif',
             fontSize: '26px',
@@ -115,44 +164,51 @@ export default function QuizScreen() {
             lineHeight: 1.35,
             marginBottom: '20px',
           }}>
-            {word.korean}
+            {questionText}
           </h2>
 
-          {/* 선택지 — Pretendard */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {shuffledChoices.map((choice, i) => (
-              <QuizOption
-                key={i}
-                label={`${i + 1}. ${choice}`}
-                status={getOptionStatus(choice)}
-                onClick={() => handleSelect(choice)}
-              />
-            ))}
-          </div>
+          {/* API 선택지 (4개, 한국어 뜻) */}
+          {apiQ && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {shuffledApiOptions.map((option, i) => (
+                <QuizOption
+                  key={option.id}
+                  label={`${i + 1}. ${option.text}`}
+                  status={getStatusApi(option)}
+                  onClick={() => handleSelectApi(option)}
+                />
+              ))}
+            </div>
+          )}
 
-          {/* 스페이서 */}
+          {/* 로컬 선택지 (3개, 영어 단어) - API 없을 때 fallback */}
+          {!apiQ && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {shuffledLocalChoices.map((choice, i) => (
+                <QuizOption
+                  key={i}
+                  label={`${i + 1}. ${choice}`}
+                  status={getStatusLocal(choice)}
+                  onClick={() => handleSelectLocal(choice)}
+                />
+              ))}
+            </div>
+          )}
+
           <div style={{ flex: 1 }} />
-
         </div>
       </div>
 
-      {/* My 버튼 — 카드 아래, 우측 정렬 */}
+      {/* My 버튼 */}
       <div style={{ padding: '16px 24px 36px', display: 'flex', justifyContent: 'flex-end' }}>
         {hasCompleted && (
           <div
             onClick={goToMy}
             style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '4px',
-              background: '#fff',
-              borderRadius: '999px',
-              width: '72px',
-              height: '72px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-              cursor: 'pointer',
+              display: 'flex', flexDirection: 'column', alignItems: 'center',
+              justifyContent: 'center', gap: '4px', background: '#fff',
+              borderRadius: '999px', width: '72px', height: '72px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)', cursor: 'pointer',
             }}
           >
             <img src={myIcon} alt="My" style={{ width: '26px', height: '26px', objectFit: 'contain' }} />

@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { DAYS } from '../data/words'
 import useAppStore from '../store/useAppStore'
@@ -63,19 +63,34 @@ function parseExample(example) {
 
 export default function StudyScreen() {
   const navigate = useNavigate()
-  const { nickname, dayProgress } = useAppStore()
+  const { nickname, dayProgress, apiQuestions } = useAppStore()
   const hasCompleted = Object.values(dayProgress).some(v => v === 'complete')
   const { day, wordIndex } = useParams()
   const dayNum = parseInt(day)
   const wordIdx = parseInt(wordIndex)
 
+  // API 우선, 없으면 로컬 데이터 fallback
+  const apiQ = apiQuestions[dayNum]?.[wordIdx]
   const dayData = DAYS.find((d) => d.day === dayNum)
-  const word = dayData?.words[wordIdx] ?? null
+  const localWord = dayData?.words[wordIdx] ?? null
+
+  // API → word 형식 변환
+  const word = useMemo(() => {
+    if (apiQ) {
+      return {
+        english: apiQ.term,
+        korean: apiQ.koreanDefinition,
+        example: apiQ.englishDefinition,   // 영어 정의를 예문 대신 표시
+        exampleKorean: apiQ.koreanDefinition !== apiQ.term ? null : null,
+      }
+    }
+    return localWord
+  }, [apiQ, localWord])
 
   // hook은 early return 전에 항상 호출해야 함 (Rules of Hooks)
   const { canPlay, playing, play } = usePronunciation(word?.english ?? '')
 
-  if (!dayData || !word) return null
+  if (!word) return null
 
   const handleNext = () => {
     const nextIdx = wordIdx + 1

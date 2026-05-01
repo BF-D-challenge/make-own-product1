@@ -165,6 +165,13 @@ const useAppStore = create((set, get) => ({
     set({ selectedAnswer: null, quizResult: null })
   },
 
+  // API 문제 캐시 (세션 내 유지, localStorage 저장 안함)
+  // { [day]: Question[] }
+  apiQuestions: {},
+  setApiQuestions: (day, questions) => set((state) => ({
+    apiQuestions: { ...state.apiQuestions, [day]: questions },
+  })),
+
   // 현재 진행 단어 설정
   setCurrentWord: (day, wordIndex) => {
     set({ currentDay: day, currentWordIndex: wordIndex, selectedAnswer: null, quizResult: null })
