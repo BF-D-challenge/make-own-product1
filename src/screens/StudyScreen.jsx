@@ -80,8 +80,9 @@ export default function StudyScreen() {
       return {
         english: apiQ.term,
         korean: apiQ.koreanDefinition,
-        example: apiQ.englishDefinition,   // 영어 정의를 예문 대신 표시
-        exampleKorean: apiQ.koreanDefinition !== apiQ.term ? null : null,
+        example: apiQ.englishDefinition,
+        exampleKorean: null,
+        isApi: true,   // API 데이터 여부 플래그
       }
     }
     return localWord
@@ -201,6 +202,18 @@ export default function StudyScreen() {
           }}>
             <img src={lineStroke} alt="" style={{ width: '4px', flexShrink: 0, alignSelf: 'stretch', objectFit: 'fill', height: '100%' }} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {word.isApi && (
+              <p style={{
+                fontFamily: 'Pretendard, sans-serif',
+                fontSize: '11px',
+                fontWeight: '600',
+                color: '#AAAAAA',
+                letterSpacing: '0.05em',
+                textTransform: 'uppercase',
+              }}>
+                English Definition
+              </p>
+            )}
             <p style={{
               fontFamily: 'Pretendard, sans-serif',
               fontSize: '14px',
