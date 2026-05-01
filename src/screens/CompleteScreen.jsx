@@ -15,6 +15,7 @@ export default function CompleteScreen() {
 
   const fromQuiz = location.state?.fromQuiz
   const fromHome = location.state?.fromHome
+  const isDay7Finish = dayNum === 7 && fromQuiz
 
   // 진입 경로에 따라 오답 목록 결정
   const wrongWords = fromHome ? lastWrongWords : sessionWrongWords
@@ -30,8 +31,12 @@ export default function CompleteScreen() {
     if (fromQuiz) completeDay(dayNum)
   }, [dayNum])
 
-  const goToMy = () => {
-    if (dayNum === 7) resetProgress()
+  // My 버튼: 리셋 없이 그냥 이동
+  const goToMy = () => navigate('/my')
+
+  // 다시 도전하기: 명시적으로 리셋 후 이동 (Day 7 완료 시만 표시)
+  const handleRestart = () => {
+    resetProgress()
     navigate('/my')
   }
 
@@ -46,12 +51,25 @@ export default function CompleteScreen() {
     >
       {/* 상단 타이틀 */}
       <div style={{ padding: '52px 24px 16px', flexShrink: 0 }}>
-        <p style={{ fontFamily: 'BM kkubulim, sans-serif', fontSize: '24px', color: '#444', lineHeight: 1.5 }}>
-          {nickname}님,
-        </p>
-        <p style={{ fontFamily: 'BM kkubulim, sans-serif', fontSize: '24px', color: '#444', lineHeight: 1.5 }}>
-          {hasPerfect ? '완벽해요, 대단한데요!' : '오늘도 해내셨네요, 축하해요!'}
-        </p>
+        {isDay7Finish ? (
+          <>
+            <p style={{ fontFamily: 'BM kkubulim, sans-serif', fontSize: '24px', color: '#444', lineHeight: 1.5 }}>
+              7일 챌린지 완료!
+            </p>
+            <p style={{ fontFamily: 'BM kkubulim, sans-serif', fontSize: '24px', color: '#444', lineHeight: 1.5 }}>
+              대단해요, 진짜로요!
+            </p>
+          </>
+        ) : (
+          <>
+            <p style={{ fontFamily: 'BM kkubulim, sans-serif', fontSize: '24px', color: '#444', lineHeight: 1.5 }}>
+              {nickname}님,
+            </p>
+            <p style={{ fontFamily: 'BM kkubulim, sans-serif', fontSize: '24px', color: '#444', lineHeight: 1.5 }}>
+              {hasPerfect ? '완벽해요, 대단한데요!' : '오늘도 해내셨네요, 축하해요!'}
+            </p>
+          </>
+        )}
       </div>
 
       {/* 콘텐츠 */}
@@ -196,6 +214,28 @@ export default function CompleteScreen() {
           )}
         </div>
       </div>
+
+      {/* Day 7 완료 시 — 다시 도전하기 버튼 */}
+      {isDay7Finish && (
+        <div style={{ padding: '12px 24px 0', display: 'flex', justifyContent: 'center' }}>
+          <button
+            onClick={handleRestart}
+            style={{
+              background: '#CCFF00',
+              border: 'none',
+              borderRadius: '999px',
+              padding: '14px 32px',
+              fontFamily: 'BM kkubulim, sans-serif',
+              fontSize: '16px',
+              color: '#222',
+              cursor: 'pointer',
+              letterSpacing: '0.01em',
+            }}
+          >
+            다시 도전하기
+          </button>
+        </div>
+      )}
 
       {/* My 버튼 — 항상 우측 하단 고정 */}
       <div
