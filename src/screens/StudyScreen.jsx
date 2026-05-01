@@ -82,6 +82,25 @@ function usePronunciation(word) {
   return { canPlay: !!audioUrl, playing, play, example, exampleKo }
 }
 
+// 평문 예문에서 특정 단어 → 노란 하이라이트 (대소문자 무시)
+function highlightWord(sentence, word) {
+  if (!sentence || !word) return sentence
+  const regex = new RegExp(`(${word})`, 'gi')
+  const parts = sentence.split(regex)
+  return parts.map((part, i) =>
+    regex.test(part) ? (
+      <mark key={i} style={{
+        background: '#CCFF00',
+        borderRadius: '2px',
+        padding: '0 2px',
+        fontStyle: 'normal',
+      }}>
+        {part}
+      </mark>
+    ) : part
+  )
+}
+
 // 예문에서 {word} → 노란 하이라이트 파싱
 function parseExample(example) {
   const parts = example.split(/\{([^}]+)\}/g)
@@ -300,7 +319,7 @@ export default function StudyScreen() {
                     lineHeight: 1.7,
                     fontStyle: 'italic',
                   }}>
-                    "{dictExample}"
+                    "{highlightWord(dictExample, word.english)}"
                   </p>
                   {dictExampleKo && (
                     <p style={{
