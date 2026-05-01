@@ -7,25 +7,46 @@ import eastIcon from '../assets/east_icon.svg'
 import lineStroke from '../assets/line_stroke.svg'
 import myIcon from '../assets/my_icon.svg'
 
-// 단어별 오디오 URL 캐시 (화면 전환 시 재요청 방지)
-const audioCache = {}
+// 단어별 데이터 캐시 (오디오 URL + 예문)
+const wordDataCache = {}
 
 function usePronunciation(word) {
   const [audioUrl, setAudioUrl] = useState(null)
+  const [example, setExample] = useState(null)
   const [playing, setPlaying] = useState(false)
   const audioRef = useRef(null)
 
   useEffect(() => {
+    if (!word) return
     setAudioUrl(null)
+    setExample(null)
     const key = word.toLowerCase()
-    if (audioCache[key]) { setAudioUrl(audioCache[key]); return }
+
+    if (wordDataCache[key]) {
+      setAudioUrl(wordDataCache[key].audio)
+      setExample(wordDataCache[key].example)
+      return
+    }
 
     fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${key}`)
       .then(r => r.json())
       .then(data => {
-        const phonetics = data?.[0]?.phonetics ?? []
-        const url = phonetics.find(p => p.audio)?.audio ?? null
-        if (url) { audioCache[key] = url; setAudioUrl(url) }
+        const entry = data?.[0]
+        const phonetics = entry?.phonetics ?? []
+        const audio = phonetics.find(p => p.audio)?.audio ?? null
+
+        // 예문: meanings 전체를 순회해서 첫 번째 example 추출
+        let ex = null
+        for (const meaning of entry?.meanings ?? []) {
+          for (const def of meaning.definitions ?? []) {
+            if (def.example) { ex = def.example; break }
+          }
+          if (ex) break
+        }
+
+        wordDataCache[key] = { audio, example: ex }
+        setAudioUrl(audio)
+        setExample(ex)
       })
       .catch(() => {})
   }, [word])
@@ -41,7 +62,7 @@ function usePronunciation(word) {
     audio.onerror = () => setPlaying(false)
   }
 
-  return { canPlay: !!audioUrl, playing, play }
+  return { canPlay: !!audioUrl, playing, play, example }
 }
 
 // 예문에서 {word} → 노란 하이라이트 파싱
@@ -89,7 +110,7 @@ export default function StudyScreen() {
   }, [apiQ, localWord])
 
   // hook은 early return 전에 항상 호출해야 함 (Rules of Hooks)
-  const { canPlay, playing, play } = usePronunciation(word?.english ?? '')
+  const { canPlay, playing, play, example: dictExample } = usePronunciation(word?.english ?? '')
 
   if (!word) return null
 
@@ -201,39 +222,84 @@ export default function StudyScreen() {
             alignItems: 'flex-start',
           }}>
             <img src={lineStroke} alt="" style={{ width: '4px', flexShrink: 0, alignSelf: 'stretch', objectFit: 'fill', height: '100%' }} />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            {word.isApi && (
-              <p style={{
-                fontFamily: 'Pretendard, sans-serif',
-                fontSize: '11px',
-                fontWeight: '600',
-                color: '#AAAAAA',
-                letterSpacing: '0.05em',
-                textTransform: 'uppercase',
-              }}>
-                English Definition
-              </p>
-            )}
-            <p style={{
-              fontFamily: 'Pretendard, sans-serif',
-              fontSize: '14px',
-              fontWeight: '400',
-              color: '#555',
-              lineHeight: 1.7,
-            }}>
-              {parseExample(word.example)}
-            </p>
-            {word.exampleKorean && (
-              <p style={{
-                fontFamily: 'Pretendard, sans-serif',
-                fontSize: '13px',
-                fontWeight: '400',
-                color: '#888',
-                lineHeight: 1.6,
-              }}>
-                {word.exampleKorean}
-              </p>
-            )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {/* API 데이터: 영어 정의 */}
+              {word.isApi && (
+                <>
+                  <p style={{
+                    fontFamily: 'Pretendard, sans-serif',
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    color: '#AAAAAA',
+                    letterSpacing: '0.05em',
+                    textTransform: 'uppercase',
+                  }}>
+                    English Definition
+                  </p>
+                  <p style={{
+                    fontFamily: 'Pretendard, sans-serif',
+                    fontSize: '14px',
+                    fontWeight: '400',
+                    color: '#555',
+                    lineHeight: 1.7,
+                  }}>
+                    {word.example}
+                  </p>
+                </>
+              )}
+
+              {/* 로컬 데이터: {word} 하이라이트 예문 */}
+              {!word.isApi && (
+                <p style={{
+                  fontFamily: 'Pretendard, sans-serif',
+                  fontSize: '14px',
+                  fontWeight: '400',
+                  color: '#555',
+                  lineHeight: 1.7,
+                }}>
+                  {parseExample(word.example)}
+                </p>
+              )}
+
+              {/* dictionaryapi.dev 예문 (API 단어일 때만) */}
+              {word.isApi && dictExample && (
+                <>
+                  <p style={{
+                    fontFamily: 'Pretendard, sans-serif',
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    color: '#AAAAAA',
+                    letterSpacing: '0.05em',
+                    textTransform: 'uppercase',
+                    marginTop: '4px',
+                  }}>
+                    Example
+                  </p>
+                  <p style={{
+                    fontFamily: 'Pretendard, sans-serif',
+                    fontSize: '14px',
+                    fontWeight: '400',
+                    color: '#555',
+                    lineHeight: 1.7,
+                    fontStyle: 'italic',
+                  }}>
+                    "{dictExample}"
+                  </p>
+                </>
+              )}
+
+              {/* 로컬 한국어 예문 */}
+              {!word.isApi && word.exampleKorean && (
+                <p style={{
+                  fontFamily: 'Pretendard, sans-serif',
+                  fontSize: '13px',
+                  fontWeight: '400',
+                  color: '#888',
+                  lineHeight: 1.6,
+                }}>
+                  {word.exampleKorean}
+                </p>
+              )}
             </div>
           </div>
 
